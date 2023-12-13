@@ -4,5 +4,4 @@ export interface RegionDto {
     province: string;
     createdAt: Date;
     updatedAt: Date;
-    deletedAt: Date;
 }

@@ -7,5 +7,4 @@ export interface WineDto {
     region: string;
     createdAt: Date;
     updatedAt: Date;
-    deleteAt: Date;
 }

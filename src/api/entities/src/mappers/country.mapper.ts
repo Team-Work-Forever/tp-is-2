@@ -16,7 +16,6 @@ export function mapCountryToDto(country: CountryOptions): CountryDto {
         regions: mapRegions(country.region),
         createdAt: country.created_at,
         updatedAt: country.updated_at,
-        deletedAt: country.deleted_at,
     }
 }
 

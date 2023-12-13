@@ -9,6 +9,5 @@ export function mapRegionToDto(region: RegionOptions) {
         province: region.province,
         createdAt: region.created_at,
         updatedAt: region.updated_at,
-        deletedAt: region.deleted_at,
     };
 }

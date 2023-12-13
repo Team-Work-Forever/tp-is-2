@@ -6,5 +6,4 @@ export interface CountryDto {
     regions: RegionDto[];
     createdAt: Date;
     updatedAt: Date;
-    deletedAt: Date;
 }

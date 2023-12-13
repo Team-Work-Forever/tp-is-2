@@ -4,5 +4,4 @@ export interface TasterDto {
     twitterHandle: string;
     createdAt: Date;
     updatedAt: Date;
-    deleteAt: Date;
 }

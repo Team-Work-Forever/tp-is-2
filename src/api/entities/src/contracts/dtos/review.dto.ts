@@ -6,5 +6,4 @@ export interface ReviewDto {
     wineId: string;
     createdAt: Date;
     updatedAt: Date;
-    deletedAt: Date;
 }

@@ -17,6 +17,5 @@ export function mapReviewToDto(review: ReviewOptions): ReviewDto {
         wineId: review.wine.id,
         createdAt: review.created_at,
         updatedAt: review.updated_at,
-        deletedAt: review.deleted_at,
     };
 }

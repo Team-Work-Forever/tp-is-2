@@ -17,6 +17,5 @@ export function mapWineToDto(wine: WineOptions): WineDto {
         region: wine.region.name,
         createdAt: wine.created_at,
         updatedAt: wine.updated_at,
-        deleteAt: wine.deleted_at
     } as WineDto;
 }
