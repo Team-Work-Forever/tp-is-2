@@ -48,9 +48,21 @@ export class TasterController {
     }
 
     @Get(':tasterId/reviews')
-    public async getReviewsByTasterId(@Param('tasterId') tasterId: string, @Res() response: Response): Promise<Response<ReviewDto>> {
+    public async getReviewsByTasterId(@Param('tasterId') tasterId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
         const reviews = await this.tasterService.findReviewsByTasterId(tasterId);
 
         return response
             .status(200).send(reviews);
     }
+
+    @Get(':tasterId/reviews/:reviewId')
+    public async getReviewIdByTasterId(
+        @Param('tasterId') tasterId: string,
+        @Param('reviewId') reviewId: string,
+        @Res() response: Response): Promise<Response<ReviewDto>> {
+        const reviews = await this.tasterService.findByReviewIdByTasterId(reviewId, tasterId);
+
+        return response
+            .status(200).send(reviews);
+    }
+}

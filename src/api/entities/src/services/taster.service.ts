@@ -59,4 +59,19 @@ export class TasterService {
 
         return reviews.map(review => mapReviewToDto(review));
     }
+
+    async findByReviewIdByTasterId(reviewId: string, tasterId: string) {
+        const review = await this.prisma.review.findFirstOrThrow({
+            where: {
+                id: reviewId,
+                taster_id: tasterId,
+            },
+            include: {
+                taster: true,
+                wine: true,
+            }
+        });
+
+        return mapReviewToDto(review);
+    }
 }
