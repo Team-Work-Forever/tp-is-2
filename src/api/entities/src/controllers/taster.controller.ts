@@ -33,7 +33,7 @@ export class TasterController {
     }
 
     @Get(':tasterId')
-    public async getTasterById(@Param('tasterId', new UuidPipe()) tasterId: string, @Res() response: Response): Promise<Response<TasterDto>> {
+    public async getTasterById(@Param('tasterId', new UuidPipe()) { id: tasterId }, @Res() response: Response): Promise<Response<TasterDto>> {
         const taster = await this.tasterService
             .findByTasterId(tasterId);
 
@@ -42,16 +42,16 @@ export class TasterController {
     }
 
     @Delete(':tasterId')
-    public async deleteTasterId(@Param('tasterId', new UuidPipe()) tasterId: string, @Res() response: Response): Promise<Response<TasterDto>> {
+    public async deleteTasterId(@Param('tasterId', new UuidPipe()) { id: tasterId }, @Res() response: Response): Promise<Response<TasterDto>> {
         const taster = await this.tasterService
-            .findByTasterId(tasterId);
+            .deleteTaster(tasterId);
 
         return response
             .status(200).send(taster);
     }
 
     @Get(':tasterId/reviews')
-    public async getReviewsByTasterId(@Param('tasterId', new UuidPipe()) tasterId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
+    public async getReviewsByTasterId(@Param('tasterId', new UuidPipe()) { id: tasterId }, @Res() response: Response): Promise<Response<ReviewDto[]>> {
         const reviews = await this.tasterService.findReviewsByTasterId(tasterId);
 
         return response
@@ -60,8 +60,8 @@ export class TasterController {
 
     @Get(':tasterId/reviews/:reviewId')
     public async getReviewIdByTasterId(
-        @Param('tasterId', new UuidPipe()) tasterId: string,
-        @Param('reviewId', new UuidPipe()) reviewId: string,
+        @Param('tasterId', new UuidPipe()) { id: tasterId },
+        @Param('reviewId', new UuidPipe()) { id: reviewId },
         @Res() response: Response): Promise<Response<ReviewDto>> {
         const reviews = await this.tasterService.findByReviewIdByTasterId(reviewId, tasterId);
 

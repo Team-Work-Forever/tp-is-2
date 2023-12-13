@@ -30,7 +30,7 @@ export class CountryController {
     }
 
     @Get(":countryId")
-    public async getCountryById(@Param("countryId", new UuidPipe()) countryId: string, @Res() response: Response) {
+    public async getCountryById(@Param("countryId", new UuidPipe()) { id: countryId }, @Res() response: Response) {
         const country = await this.countryService.findCountryById(countryId);
 
         return response
@@ -38,7 +38,7 @@ export class CountryController {
     }
 
     @Delete(":countryId")
-    public async deleteCountryById(@Param("countryId", new UuidPipe()) countryId: string, @Res() response: Response) {
+    public async deleteCountryById(@Param("countryId", new UuidPipe()) { id: countryId }, @Res() response: Response) {
         const country = await this.countryService.deleteCountry(countryId);
 
         return response

@@ -32,14 +32,14 @@ export class ReviewController {
     }
 
     @Get(':reviewId')
-    public async findByReviewId(@Param("reviewId", new UuidPipe()) reviewId: string, @Res() response: Response) {
+    public async findByReviewId(@Param("reviewId", new UuidPipe()) { id: reviewId }, @Res() response: Response) {
         const review = await this.reviewService.findByReviewId(reviewId);
 
         return response.status(HttpStatus.OK).json(review);
     }
 
     @Delete(':reviewId')
-    public async deleteByReviewId(@Param("reviewId", new UuidPipe()) reviewId: string, @Res() response: Response) {
+    public async deleteByReviewId(@Param("reviewId", new UuidPipe()) { id: reviewId }, @Res() response: Response) {
         const review = await this.reviewService.deleteReviewById(reviewId);
 
         return response.status(HttpStatus.OK).json(review);

@@ -38,7 +38,7 @@ export class WineController {
     }
 
     @Get(":wineId")
-    public async getWineById(@Param("wineId", new UuidPipe()) wineId: string, @Res() response: Response): Promise<Response<WineDto>> {
+    public async getWineById(@Param("wineId", new UuidPipe()) { id: wineId }, @Res() response: Response): Promise<Response<WineDto>> {
         const wine = await this.wineService.findWineById(wineId);
 
         return response
@@ -46,7 +46,7 @@ export class WineController {
     }
 
     @Delete(":wineId")
-    public async deleteWineById(@Param("wineId", new UuidPipe()) wineId: string, @Res() response: Response) {
+    public async deleteWineById(@Param("wineId", new UuidPipe()) { id: wineId }, @Res() response: Response) {
         const wine = await this.wineService.deleteWine(wineId);
 
         return response
@@ -54,7 +54,7 @@ export class WineController {
     }
 
     @Get(':wineId/reviews')
-    public async getReviewsByWineId(@Param('wineId', new UuidPipe()) wineId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
+    public async getReviewsByWineId(@Param('wineId', new UuidPipe()) { id: wineId }, @Res() response: Response): Promise<Response<ReviewDto[]>> {
         const reviews = await this.wineService.findReviewsByWineId(wineId);
 
         return response
@@ -63,8 +63,8 @@ export class WineController {
 
     @Get(':wineId/reviews/:reviewId')
     public async getReviewIdByWineId(
-        @Param('wineId', new UuidPipe()) wineId: string,
-        @Param('reviewId', new UuidPipe()) reviewId: string,
+        @Param('wineId', new UuidPipe()) { id: wineId },
+        @Param('reviewId', new UuidPipe()) { id: reviewId },
         @Res() response: Response): Promise<Response<ReviewDto>> {
         const reviews = await this.wineService.findByReviewIdByWineId(reviewId, wineId);
 

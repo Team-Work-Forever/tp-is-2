@@ -1,8 +1,8 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { ErrorDto } from 'src/contracts/dtos/error.dto';
+import { ValidationErrorDto } from 'src/contracts/dtos/validation-error.dto';
 import { ZodError } from 'zod';
 
-@Catch()
+@Catch(ZodError)
 export class ZodExceptionFilter<T extends ZodError> implements ExceptionFilter {
   catch(exception: T, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -14,7 +14,7 @@ export class ZodExceptionFilter<T extends ZodError> implements ExceptionFilter {
       errors: this.parseMessageErrors(exception),
       statusCode: status,
       path: ctx.getRequest().url,
-    } as ErrorDto);
+    } as ValidationErrorDto);
   }
 
   private parseMessageErrors(errors: ZodError<any>): { reason: string; path: string }[] {

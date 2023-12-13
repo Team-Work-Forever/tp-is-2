@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { NotFoundError } from 'errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { mapReviewToDto } from 'src/mappers/review.mapper';
@@ -46,7 +47,7 @@ export class ReviewService {
     }
 
     async findByReviewId(reviewId: string): Promise<ReviewDto> {
-        const review = await this.prisma.review.findFirstOrThrow({
+        const review = await this.prisma.review.findFirst({
             where: {
                 id: reviewId,
             },
@@ -56,10 +57,16 @@ export class ReviewService {
             }
         });
 
+        if (!review) {
+            throw new NotFoundError(`Review with id ${reviewId} not found`);
+        }
+
         return mapReviewToDto(review);
     }
 
     async deleteReviewById(reviewId: string): Promise<ReviewDto> {
+        await this.findByReviewId(reviewId);
+
         const review = await this.prisma.review.delete({
             where: {
                 id: reviewId,
