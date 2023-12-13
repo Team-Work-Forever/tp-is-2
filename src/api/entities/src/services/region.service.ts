@@ -3,6 +3,7 @@ import { NotFoundError } from 'errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapRegionToDto } from 'src/mappers/region.mapper';
 import { CountryService } from './country.service';
+import { CountryDto } from 'src/contracts/dtos/country.dto';
 
 @Injectable()
 export class RegionService {
@@ -10,6 +11,10 @@ export class RegionService {
         private readonly prisma: PrismaService,
         private readonly countryService: CountryService,
     ) { }
+
+    async createRegion(countryId: string): Promise<CountryDto> {
+        throw new Error('Method not implemented.');
+    }
 
     async findAll(countryId: string) {
         await this.countryService.findCountryById(countryId);

@@ -1,4 +1,4 @@
-import { RegionDto } from "../create-region.request";
+import { RegionDto } from "./region.dto";
 
 export interface CountryDto {
     id: string;
