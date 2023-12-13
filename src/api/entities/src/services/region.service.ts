@@ -1,22 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma/prisma.service';
+import { mapRegionToDto } from 'src/mappers/region.mapper';
 
 @Injectable()
 export class RegionService {
     constructor(
         private readonly prisma: PrismaService,
     ) { }
-
-    private mapRegionToDto(region: any) {
-        return {
-            id: region.id,
-            name: region.name,
-            province: region.province,
-            createdAt: region.createdAt,
-            updatedAt: region.updatedAt,
-            deletedAt: region.deletedAt,
-        };
-    }
 
     async findAll(countryId: string) {
         const regions = await this.prisma.region.findMany({
@@ -27,7 +17,7 @@ export class RegionService {
             }
         });
 
-        return regions.map(region => this.mapRegionToDto(region));
+        return regions.map(region => mapRegionToDto(region));
     }
 
     async findByRegionId(countryId: string, regionId: string) {
@@ -43,7 +33,7 @@ export class RegionService {
             }
         });
 
-        return this.mapRegionToDto(region);
+        return mapRegionToDto(region);
     }
 
     async deleteRegionById(countryId: string, regionId: string) {
@@ -56,6 +46,6 @@ export class RegionService {
             }
         });
 
-        return this.mapRegionToDto(region);
+        return mapRegionToDto(region);
     }
 }

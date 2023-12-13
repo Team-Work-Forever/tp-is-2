@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateTasterRequest } from 'src/contracts/create-taster.request';
+import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { TasterDto } from 'src/contracts/dtos/taster.dto';
 import { TasterService } from 'src/services/taster.service';
 
@@ -45,4 +46,11 @@ export class TasterController {
         return response
             .status(200).send(taster);
     }
-}
+
+    @Get(':tasterId/reviews')
+    public async getReviewsByTasterId(@Param('tasterId') tasterId: string, @Res() response: Response): Promise<Response<ReviewDto>> {
+        const reviews = await this.tasterService.findReviewsByTasterId(tasterId);
+
+        return response
+            .status(200).send(reviews);
+    }

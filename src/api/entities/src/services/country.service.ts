@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CountryDto } from 'src/contracts/dtos/country.dto';
+import { mapCountryToDto } from 'src/mappers/country.mapper';
 
 @Injectable()
 export class CountryService {
@@ -8,15 +9,15 @@ export class CountryService {
         private readonly prisma: PrismaService
     ) { }
 
-    mapCountryToDto(country: any) {
-        return this.mapCountryToDto(country);
-    }
-
     async findAll() {
-        const countries = await this.prisma.country.findMany();
+        const countries = await this.prisma.country.findMany({
+            include: {
+                region: true,
+            }
+        });
 
         return countries.map(country => {
-            this.mapCountryToDto(country);
+            mapCountryToDto(country);
         })
     }
 
@@ -26,30 +27,39 @@ export class CountryService {
                 id: {
                     equals: countryId
                 }
+            },
+            include: {
+                region: true,
             }
         });
 
-        return this.mapCountryToDto(country);
+        return mapCountryToDto(country);
     }
 
-    async create(name: string) {
+    async create(name: string): Promise<CountryDto> {
         const country = await this.prisma.country.create({
             data: {
                 name
+            },
+            include: {
+                region: true,
             }
         });
 
-        return this.mapCountryToDto(country);
+        return mapCountryToDto(country);
     }
 
-    async deleteCountry(countryId: string) {
+    async deleteCountry(countryId: string): Promise<CountryDto> {
         const country = await this.prisma.country.delete({
             where: {
                 id: countryId
+            },
+            include: {
+                region: true,
             }
         });
 
-        return this.mapCountryToDto(country);
+        return mapCountryToDto(country);
     }
 
 }

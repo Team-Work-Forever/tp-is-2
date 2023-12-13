@@ -1,25 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
+import { mapReviewToDto } from 'src/mappers/review.mapper';
 
 @Injectable()
 export class ReviewService {
     constructor(
         private readonly prisma: PrismaService,
     ) { }
-
-    public mapReviewToDto(review: any): ReviewDto {
-        return {
-            id: review.id,
-            points: review.points,
-            description: review.description,
-            twitterHandle: review.taster.twitter_handle,
-            wineId: review.wine.id,
-            createdAt: review.createdAt,
-            updatedAt: review.updatedAt,
-            deletedAt: review.deletedAt,
-        };
-    }
 
     async createReview(points: number, description: string, twitterHandle: string, wineId: string): Promise<ReviewDto> {
         const review = await this.prisma.review.create({
@@ -43,7 +31,7 @@ export class ReviewService {
             }
         });
 
-        return this.mapReviewToDto(review);
+        return mapReviewToDto(review);
     }
 
     async findAll(): Promise<ReviewDto[]> {
@@ -54,7 +42,7 @@ export class ReviewService {
             }
         });
 
-        return reviews.map(review => this.mapReviewToDto(review));
+        return reviews.map(review => mapReviewToDto(review));
     }
 
     async findByReviewId(reviewId: string): Promise<ReviewDto> {
@@ -68,7 +56,7 @@ export class ReviewService {
             }
         });
 
-        return this.mapReviewToDto(review);
+        return mapReviewToDto(review);
     }
 
     async deleteReviewById(reviewId: string): Promise<ReviewDto> {
@@ -82,6 +70,6 @@ export class ReviewService {
             }
         });
 
-        return this.mapReviewToDto(review);
+        return mapReviewToDto(review);
     }
 }
