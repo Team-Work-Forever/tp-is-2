@@ -1,0 +1,78 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis(version: "3.4.1"), uuid_ossp(map: "uuid-ossp", schema: "public")]
+}
+
+model country {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String    @db.VarChar(25)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  region     region[]
+}
+
+model region {
+  id          String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String                   @unique @db.VarChar(25)
+  province    String                   @unique @db.VarChar(50)
+  coordinates Unsupported("geometry")?
+  country_id  String                   @db.Uuid
+  created_at  DateTime?                @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?                @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime?                @db.Timestamp(6)
+  country     country                  @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "country_id_fk")
+  wine        wine[]
+}
+
+model review {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  points      Int
+  description String    @db.VarChar(100)
+  taster_id   String    @db.Uuid
+  wine_id     String    @db.Uuid
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
+  taster      taster    @relation(fields: [taster_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "taster_id_fk")
+  wine        wine      @relation(fields: [wine_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "wine_id_fk2")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model taster {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name           String    @unique @db.VarChar(25)
+  twitter_handle String    @unique @db.VarChar(50)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at     DateTime? @db.Timestamp(6)
+  review         review[]
+}
+
+model wine {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  price       Float
+  designation String    @db.VarChar(100)
+  variety     String    @db.VarChar(50)
+  winery      String    @db.VarChar(50)
+  region_id   String    @db.Uuid
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
+  review      review[]
+  region      region    @relation(fields: [region_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "region_id_fk")
+}
