@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateWineRequest } from 'src/contracts/create-wine.request';
+import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { WineDto } from 'src/contracts/dtos/wine.dto';
 import { WineService } from 'src/services/wine.service';
 
@@ -49,5 +50,24 @@ export class WineController {
 
         return response
             .status(200).send(wine);
+    }
+
+    @Get(':wineId/reviews')
+    public async getReviewsByWineId(@Param('wineId') wineId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
+        const reviews = await this.wineService.findReviewsByWineId(wineId);
+
+        return response
+            .status(200).send(reviews);
+    }
+
+    @Get(':wineId/reviews/:reviewId')
+    public async getReviewIdByWineId(
+        @Param('wineId') wineId: string,
+        @Param('reviewId') reviewId: string,
+        @Res() response: Response): Promise<Response<ReviewDto>> {
+        const reviews = await this.wineService.findByReviewIdByWineId(reviewId, wineId);
+
+        return response
+            .status(200).send(reviews);
     }
 }

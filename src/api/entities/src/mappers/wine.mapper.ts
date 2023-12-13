@@ -7,7 +7,7 @@ export type WineOptions = Prisma.wineGetPayload<{
     }
 }>;
 
-export function mapToWineDto(wine: WineOptions): WineDto {
+export function mapWineToDto(wine: WineOptions): WineDto {
     return {
         id: wine.id,
         price: wine.price,
