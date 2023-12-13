@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateWineRequest } from 'src/contracts/create-wine.request';
+import { CreateWineRequest, wineSchema } from 'src/contracts/create-wine.request';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { WineDto } from 'src/contracts/dtos/wine.dto';
+import { UuidPipe } from 'src/pipes/uuid.pipe';
+import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { WineService } from 'src/services/wine.service';
 
 @Controller('wines')
@@ -12,9 +14,8 @@ export class WineController {
     ) { }
 
     @Post()
+    @UsePipes(new ZodValidationPipe(wineSchema))
     public async createWine(@Body() request: CreateWineRequest, @Res() response: Response): Promise<Response<WineDto>> {
-        console.log(request);
-
         const wine =
             await this.wineService.create(
                 request.price,
@@ -37,7 +38,7 @@ export class WineController {
     }
 
     @Get(":wineId")
-    public async getWineById(@Param("wineId") wineId: string, @Res() response: Response): Promise<Response<WineDto>> {
+    public async getWineById(@Param("wineId", new UuidPipe()) wineId: string, @Res() response: Response): Promise<Response<WineDto>> {
         const wine = await this.wineService.findWineById(wineId);
 
         return response
@@ -45,7 +46,7 @@ export class WineController {
     }
 
     @Delete(":wineId")
-    public async deleteWineById(@Param("wineId") wineId: string, @Res() response: Response) {
+    public async deleteWineById(@Param("wineId", new UuidPipe()) wineId: string, @Res() response: Response) {
         const wine = await this.wineService.deleteWine(wineId);
 
         return response
@@ -53,7 +54,7 @@ export class WineController {
     }
 
     @Get(':wineId/reviews')
-    public async getReviewsByWineId(@Param('wineId') wineId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
+    public async getReviewsByWineId(@Param('wineId', new UuidPipe()) wineId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
         const reviews = await this.wineService.findReviewsByWineId(wineId);
 
         return response
@@ -62,8 +63,8 @@ export class WineController {
 
     @Get(':wineId/reviews/:reviewId')
     public async getReviewIdByWineId(
-        @Param('wineId') wineId: string,
-        @Param('reviewId') reviewId: string,
+        @Param('wineId', new UuidPipe()) wineId: string,
+        @Param('reviewId', new UuidPipe()) reviewId: string,
         @Res() response: Response): Promise<Response<ReviewDto>> {
         const reviews = await this.wineService.findByReviewIdByWineId(reviewId, wineId);
 

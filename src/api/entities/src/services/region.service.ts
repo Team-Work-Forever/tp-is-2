@@ -21,9 +21,6 @@ export class RegionService {
     }
 
     async findByRegionId(countryId: string, regionId: string) {
-        console.log(countryId, regionId);
-
-
         const region = await this.prisma.region.findFirstOrThrow({
             where: {
                 id: regionId,

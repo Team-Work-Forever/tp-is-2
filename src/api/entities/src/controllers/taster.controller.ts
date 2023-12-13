@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateTasterRequest } from 'src/contracts/create-taster.request';
+import { CreateTasterRequest, tasterSchema } from 'src/contracts/create-taster.request';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { TasterDto } from 'src/contracts/dtos/taster.dto';
+import { UuidPipe } from 'src/pipes/uuid.pipe';
+import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { TasterService } from 'src/services/taster.service';
 
 @Controller('tasters')
@@ -12,6 +14,7 @@ export class TasterController {
     ) { }
 
     @Post()
+    @UsePipes(new ZodValidationPipe(tasterSchema))
     public async createTaster(@Body() request: CreateTasterRequest, @Res() response: Response): Promise<Response<TasterDto>> {
         const taster = await this.tasterService
             .createTaster(request.name, request.twitterHandle);
@@ -30,7 +33,7 @@ export class TasterController {
     }
 
     @Get(':tasterId')
-    public async getTasterById(@Param('tasterId') tasterId: string, @Res() response: Response): Promise<Response<TasterDto>> {
+    public async getTasterById(@Param('tasterId', new UuidPipe()) tasterId: string, @Res() response: Response): Promise<Response<TasterDto>> {
         const taster = await this.tasterService
             .findByTasterId(tasterId);
 
@@ -39,7 +42,7 @@ export class TasterController {
     }
 
     @Delete(':tasterId')
-    public async deleteTasterId(@Param('tasterId') tasterId: string, @Res() response: Response): Promise<Response<TasterDto>> {
+    public async deleteTasterId(@Param('tasterId', new UuidPipe()) tasterId: string, @Res() response: Response): Promise<Response<TasterDto>> {
         const taster = await this.tasterService
             .findByTasterId(tasterId);
 
@@ -48,7 +51,7 @@ export class TasterController {
     }
 
     @Get(':tasterId/reviews')
-    public async getReviewsByTasterId(@Param('tasterId') tasterId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
+    public async getReviewsByTasterId(@Param('tasterId', new UuidPipe()) tasterId: string, @Res() response: Response): Promise<Response<ReviewDto[]>> {
         const reviews = await this.tasterService.findReviewsByTasterId(tasterId);
 
         return response
@@ -57,8 +60,8 @@ export class TasterController {
 
     @Get(':tasterId/reviews/:reviewId')
     public async getReviewIdByTasterId(
-        @Param('tasterId') tasterId: string,
-        @Param('reviewId') reviewId: string,
+        @Param('tasterId', new UuidPipe()) tasterId: string,
+        @Param('reviewId', new UuidPipe()) reviewId: string,
         @Res() response: Response): Promise<Response<ReviewDto>> {
         const reviews = await this.tasterService.findByReviewIdByTasterId(reviewId, tasterId);
 

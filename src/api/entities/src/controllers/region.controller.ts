@@ -1,5 +1,6 @@
 import { Controller, Delete, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { RegionService } from 'src/services/region.service';
 
 @Controller('countries/:countryId/regions')
@@ -9,7 +10,7 @@ export class RegionController {
     ) { }
 
     @Get()
-    public async getAllRegions(@Param("countryId") countryId: string, @Res() response: Response) {
+    public async getAllRegions(@Param("countryId", new UuidPipe()) countryId: string, @Res() response: Response) {
         const regions = await this.regionService.findAll(countryId);
 
         return response.status(200).json(regions);
@@ -17,8 +18,8 @@ export class RegionController {
 
     @Get(':regionId')
     public async getRegionById(
-        @Param("countryId") countryId: string,
-        @Param("regionId") regionId: string,
+        @Param("countryId", new UuidPipe()) countryId: string,
+        @Param("regionId", new UuidPipe()) regionId: string,
         @Res() response: Response) {
         const regions = await this.regionService.findByRegionId(countryId, regionId);
 
@@ -27,8 +28,8 @@ export class RegionController {
 
     @Delete(':regionId')
     public async deleteRegionById(
-        @Param("countryId") countryId: string,
-        @Param("regionId") regionId: string,
+        @Param("countryId", new UuidPipe()) countryId: string,
+        @Param("regionId", new UuidPipe()) regionId: string,
         @Res() response: Response) {
         const regions = await this.regionService.deleteRegionById(countryId, regionId);
 

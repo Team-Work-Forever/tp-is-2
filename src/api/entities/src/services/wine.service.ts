@@ -24,9 +24,6 @@ export class WineService {
     }
 
     async findWineById(wineId: string) {
-        console.log(wineId);
-
-
         const wine = await this.prisma.wine.findFirst({
             where: {
                 id: wineId,

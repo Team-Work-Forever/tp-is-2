@@ -22,18 +22,22 @@ export class CountryService {
     }
 
     async findCountryById(countryId: string) {
-        const country = await this.prisma.country.findFirst({
-            where: {
-                id: {
-                    equals: countryId
+        try {
+            const country = await this.prisma.country.findFirstOrThrow({
+                where: {
+                    id: {
+                        equals: countryId
+                    }
+                },
+                include: {
+                    region: true,
                 }
-            },
-            include: {
-                region: true,
-            }
-        });
+            });
 
-        return mapCountryToDto(country);
+            return mapCountryToDto(country);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async create(name: string): Promise<CountryDto> {
