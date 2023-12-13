@@ -4,6 +4,7 @@ import { ZodExceptionFilter } from './middlewares/zod-exception.filter';
 
 import * as express from 'express';
 import { ConflitExceptionFilter } from './middlewares/conflit-exception.filter';
+import { PrismaClient } from '@prisma/client';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

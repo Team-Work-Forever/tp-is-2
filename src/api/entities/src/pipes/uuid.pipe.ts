@@ -5,8 +5,6 @@ import { z } from 'zod';
 @Injectable()
 export class UuidPipe implements PipeTransform {
   transform(value: string, metadata: ArgumentMetadata) {
-    console.log(metadata);
-
     return z.object({ id: uuidValidator(metadata.data) }).parse({ id: value });
   }
 }
