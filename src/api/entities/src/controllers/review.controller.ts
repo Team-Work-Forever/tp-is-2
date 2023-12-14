@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateReviewRequest, reviewSchema } from 'src/contracts/create-review.request';
+import { CreateReviewRequest, UpdateReviewRequest, reviewSchema, updateReviewSchema } from 'src/contracts/review.requests';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { ReviewService } from 'src/services/review.service';
@@ -22,6 +22,18 @@ export class ReviewController {
         );
 
         return response.status(HttpStatus.CREATED).json(review);
+    }
+
+    @Put(":reviewId")
+    public async update(
+        @Body(new ZodValidationPipe(updateReviewSchema)) request: UpdateReviewRequest,
+        @Param("reviewId", new UuidPipe()) { id: reviewId },
+        @Res() response: Response
+    ) {
+        const review = await this.reviewService.update({ ...request, reviewId });
+
+        return response
+            .status(HttpStatus.ACCEPTED).json(review);
     }
 
     @Get()

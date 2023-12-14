@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { NotFoundError } from 'errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
+import { UpdateReviewRequest } from 'src/contracts/review.requests';
 import { mapReviewToDto } from 'src/mappers/review.mapper';
+
+type UpdateReview = UpdateReviewRequest & {
+    reviewId: string
+}
 
 @Injectable()
 export class ReviewService {
@@ -33,6 +38,26 @@ export class ReviewService {
         });
 
         return mapReviewToDto(review);
+    }
+
+    async update(request: UpdateReview) {
+        await this.findByReviewId(request.reviewId);
+
+        const updatedReview = await this.prisma.review.update({
+            where: {
+                id: request.reviewId,
+            },
+            data: {
+                points: request.points,
+                description: request.description,
+            },
+            include: {
+                taster: true,
+                wine: true
+            }
+        });
+
+        return mapReviewToDto(updatedReview);
     }
 
     async findAll(): Promise<ReviewDto[]> {

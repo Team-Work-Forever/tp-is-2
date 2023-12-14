@@ -14,3 +14,14 @@ export const reviewSchema = z
     .required();
 
 export type CreateReviewRequest = z.infer<typeof reviewSchema>;
+
+export const updateReviewSchema = z
+    .object({
+        points: numberValidator("Points").optional(),
+        description: textValidator("Description").optional(),
+    })
+    .refine(data => data.points !== undefined || data.description !== undefined, {
+        message: 'At least one of name or twitterHandle is required',
+    });
+
+export type UpdateReviewRequest = z.infer<typeof updateReviewSchema>;
