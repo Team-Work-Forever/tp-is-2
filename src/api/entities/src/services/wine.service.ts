@@ -8,6 +8,12 @@ import { Prisma } from '@prisma/client';
 import { UniqueConstraintError } from 'errors/unique-contraint.error';
 import { ReviewService } from './review.service';
 import { ConflitError } from 'errors/confilt.error';
+import { CreateWineRequest } from 'src/contracts/wine.requests';
+
+type CreateWine = CreateWineRequest;
+type UpdateWine = CreateWineRequest & {
+    wineId: string;
+}
 
 @Injectable()
 export class WineService {
@@ -66,7 +72,7 @@ export class WineService {
             wine => mapWineToDto(wine));
     }
 
-    async create(price: number, designation: string, variety: string, winery: string, region: string) {
+    async create({ price, designation, variety, winery, region }: CreateWine) {
         try {
             const wine = await this.prisma.wine.create({
                 data: {
@@ -91,6 +97,27 @@ export class WineService {
                 throw new UniqueConstraintError("This wine already exists");
             }
         }
+    }
+
+    async update(request: UpdateWine) {
+        await this.findWineById(request.wineId);
+
+        const wine = await this.prisma.wine.update({
+            where: {
+                id: request.wineId,
+            },
+            data: {
+                price: request.price,
+                designation: request.designation,
+                variety: request.variety,
+                winery: request.winery,
+            },
+            include: {
+                region: true
+            }
+        });
+
+        return mapWineToDto(wine);
     }
 
     async findByReviewIdByWineId(reviewId: string, wineId: string): Promise<ReviewDto> {

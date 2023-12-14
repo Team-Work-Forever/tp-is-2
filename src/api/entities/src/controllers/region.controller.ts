@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res, UsePipes } from '@nestjs/common';
-import { Response } from 'express';
-import { CreateRegionRequest, regionSchema } from 'src/contracts/create-region.request';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
+import { Response, response } from 'express';
+import { CreateRegionRequest, regionSchema, updateRegionSchema } from 'src/contracts/region.requests';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { RegionService } from 'src/services/region.service';
@@ -20,6 +20,19 @@ export class RegionController {
 
         return response
             .status(HttpStatus.CREATED).json(region);
+    }
+
+    @Put(":regionId")
+    public async updateRegion(
+        @Body(new ZodValidationPipe(updateRegionSchema)) request: CreateRegionRequest,
+        @Param("countryId", new UuidPipe()) { id: countryId },
+        @Param("regionId", new UuidPipe()) { id: regionId },
+        @Res() response: Response) {
+
+        const region = await this.regionService.updateRegion({ ...request, countryId, regionId });
+
+        return response
+            .status(HttpStatus.ACCEPTED).json(region);
     }
 
     @Get()

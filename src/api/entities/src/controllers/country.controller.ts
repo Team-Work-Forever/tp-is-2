@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateCountryRequest, countrySchema } from 'src/contracts/create-country.request';
+import { CreateCountryRequest, UpdateCountryRequest, countrySchema, updateCountrySchema } from 'src/contracts/country.requests';
 import { CountryDto } from 'src/contracts/dtos/country.dto';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
@@ -21,6 +21,17 @@ export class CountryController {
 
         return response
             .status(201).send(country);
+    }
+
+    @Put(":countryId")
+    public async updateCountry(
+        @Body(new ZodValidationPipe(updateCountrySchema)) request: UpdateCountryRequest,
+        @Param("countryId", new UuidPipe()) { id: countryId },
+        @Res() response: Response): Promise<Response<CountryDto>> {
+        const country = await this.countryService.update({ ...request, id: countryId });
+
+        return response
+            .status(HttpStatus.ACCEPTED).send(country);
     }
 
     @Get()

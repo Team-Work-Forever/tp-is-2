@@ -8,6 +8,10 @@ export type CreateRegionDao = {
     country_id: string;
 }
 
+export type UpdateRegionDao = CreateRegionDao & {
+    id: string;
+}
+
 export type RegionDao = {
     id: string;
     name: string;
@@ -23,6 +27,59 @@ export default Prisma.defineExtension((prisma) => {
     return prisma.$extends({
         model: {
             region: {
+                async update({
+                    id,
+                    name,
+                    province,
+                    lat,
+                    lon
+                }: UpdateRegionDao): Promise<RegionDao> {
+                    const context = Prisma.getExtensionContext(prisma);
+                    const updateProperties = [];
+
+                    if (lat && lon) {
+                        const point = `POINT(${lat} ${lon})`;
+                        updateProperties.push(`coordinates = ST_GeomFromText($1, 4326)`);
+                    }
+
+                    if (name) {
+                        updateProperties.push(`name = 'Lisboa'`);
+                    }
+
+                    if (province) {
+                        updateProperties.push(`province = $3`);
+                    }
+
+                    console.log(`
+                        UPDATE region SET
+                            ${updateProperties.join(", ")}
+                        WHERE id = 'c7702222-3caa-4b9d-ae40-119adb58d825'
+                    `);
+
+
+                    const response = await context.$queryRaw`
+                        UPDATE region SET
+                            ${Prisma.join(updateProperties, ", ")}
+                        WHERE id = 'c7702222-3caa-4b9d-ae40-119adb58d825'
+                    `;
+
+                    const country = await context.country.findFirst({
+                        where: {
+                            id: response[0].country_id
+                        }
+                    })
+
+                    return {
+                        id: response[0].id,
+                        name,
+                        province,
+                        lat,
+                        lon,
+                        country: country?.name,
+                        created_at: response[0].created_at,
+                        updated_at: response[0].updated_at,
+                    } as RegionDao;
+                },
                 async create({
                     name,
                     province,

@@ -21,7 +21,7 @@ export const updateReviewSchema = z
         description: textValidator("Description").optional(),
     })
     .refine(data => data.points !== undefined || data.description !== undefined, {
-        message: 'At least one of name or twitterHandle is required',
+        message: 'At least one of the fields is required',
     });
 
 export type UpdateReviewRequest = z.infer<typeof updateReviewSchema>;

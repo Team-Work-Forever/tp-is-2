@@ -3,13 +3,19 @@ import { NotFoundError } from 'errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapRegionDaoToDto, mapRegionToDto } from 'src/mappers/region.mapper';
 import { CountryService } from './country.service';
-import { CreateRegionRequest } from 'src/contracts/create-region.request';
+import { CreateRegionRequest } from 'src/contracts/region.requests';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
 import { ConflitError } from 'errors/confilt.error';
 
 type CreateRegion = CreateRegionRequest & {
     countryId: string;
 }
+
+type UpdateRegion = CreateRegionRequest & {
+    countryId: string;
+    regionId: string;
+}
+
 
 @Injectable()
 export class RegionService {
@@ -33,6 +39,29 @@ export class RegionService {
 
             return mapRegionDaoToDto(region);
         } catch (error) {
+        }
+    }
+
+    async updateRegion(request: UpdateRegion) {
+        await this.countryService.findCountryById(request.countryId);
+        const extendedPrisma = this.prisma.$extends(createRegionExtension);
+
+        console.log(request);
+
+
+        try {
+            const region = await extendedPrisma.region.update({
+                id: request.regionId,
+                name: request.name,
+                province: request.province,
+                lat: request.lat,
+                lon: request.lon,
+                country_id: request.countryId,
+            });
+
+            return mapRegionDaoToDto(region);
+        } catch (error) {
+            console.log(error);
         }
     }
 

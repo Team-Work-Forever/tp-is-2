@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateWineRequest, wineSchema } from 'src/contracts/create-wine.request';
+import { CreateWineRequest, UpdateWineRequest, updateWineSchema, wineSchema } from 'src/contracts/wine.requests';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { WineDto } from 'src/contracts/dtos/wine.dto';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
@@ -17,16 +17,22 @@ export class WineController {
     @UsePipes(new ZodValidationPipe(wineSchema))
     public async createWine(@Body() request: CreateWineRequest, @Res() response: Response): Promise<Response<WineDto>> {
         const wine =
-            await this.wineService.create(
-                request.price,
-                request.designation,
-                request.variety,
-                request.winery,
-                request.region
-            );
+            await this.wineService.create({ ...request });
 
         return response
             .status(201).send(wine);
+    }
+
+    @Put(":wineId")
+    public async updateWine(
+        @Body(new ZodValidationPipe(updateWineSchema)) request: UpdateWineRequest,
+        @Param("wineId", new UuidPipe()) { id: wineId },
+        @Res() response: Response): Promise<Response<WineDto>> {
+        const wine =
+            await this.wineService.update({ ...request, wineId });
+
+        return response
+            .status(200).send(wine);
     }
 
     @Get()

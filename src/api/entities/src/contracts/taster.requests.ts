@@ -17,7 +17,7 @@ export const updateTasterSchema = z
         twitterHandle: twitterHandleValidator.optional()
     })
     .refine(data => data.name !== undefined || data.twitterHandle !== undefined, {
-        message: 'At least one of name or twitterHandle is required',
+        message: 'At least one of the fields is required',
     });
 
 export type UpdateTasterRequest = z.infer<typeof updateTasterSchema>;

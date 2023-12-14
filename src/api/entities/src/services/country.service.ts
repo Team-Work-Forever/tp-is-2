@@ -5,9 +5,13 @@ import { NotFoundError } from 'errors/not-found.error';
 import { UniqueConstraintError } from 'errors/unique-contraint.error';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { CreateCountryRequest } from 'src/contracts/create-country.request';
+import { CreateCountryRequest } from 'src/contracts/country.requests';
 import { CountryDto } from 'src/contracts/dtos/country.dto';
 import { mapCountryToDto } from 'src/mappers/country.mapper';
+
+type UpdateCountryOptions = CreateCountryRequest & {
+    id: string;
+};
 
 @Injectable()
 export class CountryService {
@@ -63,6 +67,25 @@ export class CountryService {
                 throw new UniqueConstraintError("Country already exists");
             }
         }
+    }
+
+    async update(request: UpdateCountryOptions) {
+        await this.findCountryById(request.id);
+
+        const country = await this.prisma.country.update({
+            where: {
+                id: request.id
+            },
+            data: {
+                name: request.name
+            },
+            include: {
+                region: true,
+            }
+        });
+
+
+        return mapCountryToDto(country);
     }
 
     async findAll() {
