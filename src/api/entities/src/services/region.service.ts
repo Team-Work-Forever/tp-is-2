@@ -52,21 +52,17 @@ export class RegionService {
 
     async findByRegionId(countryId: string, regionId: string) {
         await this.countryService.findCountryById(countryId);
+        const extendedPrisma = this.prisma.$extends(createRegionExtension);
 
-        const region = await this.prisma.region.findFirst({
-            where: {
-                id: regionId,
-                country: {
-                    id: countryId,
-                }
-            }
-        });
+        const region = await extendedPrisma
+            .region
+            .fetchRegionById(regionId);
 
         if (!region) {
             throw new NotFoundError("Region not found");
         }
 
-        return mapRegionToDto(region);
+        return mapRegionDaoToDto(region);
     }
 
     async deleteRegionById(countryId: string, regionId: string) {

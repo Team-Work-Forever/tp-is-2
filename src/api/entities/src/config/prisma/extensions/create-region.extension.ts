@@ -56,6 +56,40 @@ export default Prisma.defineExtension((prisma) => {
                         updated_at: response[0].updated_at,
                     } as RegionDao;
                 },
+                async fetchRegionById(regionId: string): Promise<RegionDao | null> {
+                    const context = Prisma.getExtensionContext(prisma);
+
+                    const response = await context.$queryRaw`
+                        SELECT 
+                            id, 
+                            name, 
+                            province, 
+                            ST_X(coordinates::geometry) as lat, 
+                            ST_Y(coordinates::geometry) as lon, 
+                            country_id as country, 
+                            created_at, 
+                            updated_at FROM "region" WHERE id = ${regionId}::uuid;
+                    `;
+
+                    return response[0] as RegionDao;
+                },
+                async fetchManyByCountryId(countryId: string): Promise<RegionDao[]> {
+                    const context = Prisma.getExtensionContext(prisma);
+
+                    const response = await context.$queryRaw`
+                        SELECT 
+                            id, 
+                            name, 
+                            province, 
+                            ST_X(coordinates::geometry) as lat, 
+                            ST_Y(coordinates::geometry) as lon, 
+                            country_id as country, 
+                            created_at, 
+                            updated_at FROM "region" where country_id = ${countryId}::uuid;
+                    `;
+
+                    return response as RegionDao[];
+                }
             }
         }
     })

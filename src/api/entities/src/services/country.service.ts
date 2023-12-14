@@ -6,7 +6,6 @@ import createRegionExtension from 'src/config/prisma/extensions/create-region.ex
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CreateCountryRequest } from 'src/contracts/create-country.request';
 import { CountryDto } from 'src/contracts/dtos/country.dto';
-import { RegionDto } from 'src/contracts/dtos/region.dto';
 import { mapCountryToDto } from 'src/mappers/country.mapper';
 
 @Injectable()
@@ -16,7 +15,9 @@ export class CountryService {
     ) { }
 
     async findCountryById(countryId: string) {
-        const country = await this.prisma.country.findFirst({
+        const extendedPrismas = this.prisma.$extends(createRegionExtension);
+
+        const country = await extendedPrismas.country.findFirst({
             where: {
                 id: countryId
             },
@@ -29,7 +30,7 @@ export class CountryService {
             throw new NotFoundError("Country not found");
         }
 
-        return mapCountryToDto(country);
+        return mapCountryToDto(country, await extendedPrismas.region.fetchManyByCountryId(country.id));
     }
 
     async create(request: CreateCountryRequest): Promise<CountryDto> {
@@ -64,21 +65,24 @@ export class CountryService {
     }
 
     async findAll() {
-        const countries = await this.prisma.country.findMany({
+        const extendedPrismas = this.prisma.$extends(createRegionExtension);
+
+        const countries = await extendedPrismas.country.findMany({
             include: {
                 region: true,
             }
         });
 
-        return countries.map(country => {
-            return mapCountryToDto(country);
-        })
+        return await Promise.all(countries.map(async country => {
+            return mapCountryToDto(country, await extendedPrismas.region.fetchManyByCountryId(country.id));
+        }))
     }
 
     async deleteCountry(countryId: string): Promise<CountryDto> {
+        const extendedPrismas = this.prisma.$extends(createRegionExtension);
         await this.findCountryById(countryId);
 
-        const country = await this.prisma.country.delete({
+        const country = await extendedPrismas.country.delete({
             where: {
                 id: countryId
             },
@@ -87,7 +91,7 @@ export class CountryService {
             }
         });
 
-        return mapCountryToDto(country);
+        return mapCountryToDto(country, await extendedPrismas.region.fetchManyByCountryId(country.id));
     }
 
 }
