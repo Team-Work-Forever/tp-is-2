@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { NotFoundError } from 'errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
-import { mapRegionToDto } from 'src/mappers/region.mapper';
+import { mapRegionDaoToDto, mapRegionToDto } from 'src/mappers/region.mapper';
 import { CountryService } from './country.service';
-import { CountryDto } from 'src/contracts/dtos/country.dto';
+import { CreateRegionRequest } from 'src/contracts/create-region.request';
+import { PrismaClient } from '@prisma/client';
+import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
+
+type CreateRegion = CreateRegionRequest & {
+    countryId: string;
+}
 
 @Injectable()
 export class RegionService {
@@ -12,8 +18,23 @@ export class RegionService {
         private readonly countryService: CountryService,
     ) { }
 
-    async createRegion(countryId: string): Promise<CountryDto> {
-        throw new Error('Method not implemented.');
+    async createRegion(request: CreateRegion) {
+        await this.countryService.findCountryById(request.countryId);
+        const extendedPrisma = this.prisma.$extends(createRegionExtension);
+
+        try {
+            const region = await extendedPrisma.region.create({
+                name: request.name,
+                province: request.province,
+                lat: request.lat,
+                lon: request.lon,
+                country_id: request.countryId,
+            });
+
+            return mapRegionDaoToDto(region);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async findAll(countryId: string) {

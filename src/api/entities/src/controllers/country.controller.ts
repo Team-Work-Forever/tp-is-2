@@ -14,7 +14,9 @@ export class CountryController {
 
     @Post()
     @UsePipes(new ZodValidationPipe(countrySchema))
-    public async createCountry(@Body() request: CreateCountryRequest, @Res() response: Response): Promise<Response<CountryDto>> {
+    public async createCountry(
+        @Body() request: CreateCountryRequest,
+        @Res() response: Response): Promise<Response<CountryDto>> {
         const country = await this.countryService.create(request.name);
 
         return response

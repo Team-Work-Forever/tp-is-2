@@ -19,15 +19,15 @@ model country {
 }
 
 model region {
-  id          String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name        String                   @unique @db.VarChar(25)
-  province    String                   @unique @db.VarChar(50)
-  coordinates Unsupported("geometry")?
-  country_id  String                   @db.Uuid
-  created_at  DateTime?                @default(now()) @db.Timestamp(6)
-  updated_at  DateTime?                @default(now()) @db.Timestamp(6)
-  deleted_at  DateTime?                @db.Timestamp(6)
-  country     country                  @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "country_id_fk")
+  id          String                                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String                                @unique @db.VarChar(25)
+  province    String                                @unique @db.VarChar(50)
+  coordinates Unsupported("geography(Point, 4326)")
+  country_id  String                                @db.Uuid
+  created_at  DateTime?                             @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?                             @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime?                             @db.Timestamp(6)
+  country     country                               @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "country_id_fk")
   wine        wine[]
 }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateRegionRequest, regionSchema } from 'src/contracts/create-region.request';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
@@ -12,14 +12,14 @@ export class RegionController {
     ) { }
 
     @Post()
-    @UsePipes(new ZodValidationPipe(regionSchema))
     public async createRegion(
-        @Body() request: CreateRegionRequest,
+        @Body(new ZodValidationPipe(regionSchema)) request: CreateRegionRequest,
         @Param("countryId", new UuidPipe()) { id: countryId },
         @Res() response: Response) {
-        const regions = await this.regionService.createRegion(countryId);
+        const region = await this.regionService.createRegion({ ...request, countryId });
 
-        return response.status(201).json(regions);
+        return response
+            .status(HttpStatus.CREATED).json(region);
     }
 
     @Get()
@@ -38,7 +38,8 @@ export class RegionController {
 
         const regions = await this.regionService.findByRegionId(countryId, regionId);
 
-        return response.status(200).json(regions);
+        return response
+            .status(HttpStatus.OK).json(regions);
     }
 
     @Delete(':regionId')
@@ -49,7 +50,7 @@ export class RegionController {
         const regions = await this.regionService.deleteRegionById(countryId, regionId);
 
         return response
-            .status(200).json(regions);
+            .status(HttpStatus.OK).json(regions);
     }
 
 }
