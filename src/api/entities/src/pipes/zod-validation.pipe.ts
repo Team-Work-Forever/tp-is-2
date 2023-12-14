@@ -1,9 +1,9 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
-import { ZodObject } from 'zod';
+import { ZodAny, ZodEffects, ZodObject } from 'zod';
 
 @Injectable()
 export class ZodValidationPipe implements PipeTransform {
-    constructor(private readonly schema: ZodObject<any>) { }
+    constructor(private readonly schema: ZodObject<any> | ZodEffects<any>) { }
 
     transform(value: any, _: ArgumentMetadata) {
         return this.schema.parse(value);

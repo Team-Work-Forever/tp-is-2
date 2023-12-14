@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateTasterRequest, tasterSchema } from 'src/contracts/create-taster.request';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { TasterDto } from 'src/contracts/dtos/taster.dto';
+import { CreateTasterRequest, UpdateTasterRequest, tasterSchema, updateTasterSchema } from 'src/contracts/taster.requests';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { TasterService } from 'src/services/taster.service';
@@ -21,6 +21,18 @@ export class TasterController {
 
         return response
             .status(200).send(taster);
+    }
+
+    @Put(":tasterId")
+    public async updateTaster(
+        @Body(new ZodValidationPipe(updateTasterSchema)) request: UpdateTasterRequest,
+        @Param("tasterId", new UuidPipe()) { id: tasterId },
+        @Res() response: Response
+    ) {
+        const result = this.tasterService.update({ ...request, tasterId });
+
+        return response
+            .status(HttpStatus.ACCEPTED).json(result);
     }
 
     @Get()

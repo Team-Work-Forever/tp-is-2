@@ -17,22 +17,5 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    // "paths": {
-    //   "@api/*": [
-    //     "src/ports/api/*"
-    //   ],
-    //   "@adapters/*": [
-    //     "src/adapters/*"
-    //   ],
-    //   "@application/*": [
-    //     "src/application/*"
-    //   ],
-    //   "@domain/*": [
-    //     "src/domain/*"
-    //   ],
-    //   "@infrastructure/*": [
-    //     "src/infrastructure/*"
-    //   ]
-    // }
   }
 }

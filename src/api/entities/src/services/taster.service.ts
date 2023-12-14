@@ -7,6 +7,11 @@ import { mapReviewToDto } from 'src/mappers/review.mapper';
 import { mapTasterToDto } from 'src/mappers/taster.mapper';
 import { ReviewService } from './review.service';
 import { ConflitError } from 'errors/confilt.error';
+import { UpdateTasterRequest } from 'src/contracts/taster.requests';
+
+type UpdateTaster = UpdateTasterRequest & {
+    tasterId: string
+}
 
 @Injectable()
 export class TasterService {
@@ -78,6 +83,22 @@ export class TasterService {
                 throw new UniqueConstraintError(`Taster by the name ${name} already exists`);
             }
         }
+    }
+
+    async update(taster: UpdateTaster) {
+        await this.findByTasterId(taster.tasterId);
+
+        const updatedTaster = await this.prisma.taster.update({
+            where: {
+                id: taster.tasterId
+            },
+            data: {
+                name: taster.name,
+                twitter_handle: taster.twitterHandle
+            }
+        })
+
+        return updatedTaster;
     }
 
     async findReviewsByTasterId(tasterId: string) {
