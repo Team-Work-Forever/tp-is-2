@@ -2,14 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { NotFoundError } from 'errors/not-found.error';
 import { UniqueConstraintError } from 'errors/unique-contraint.error';
+import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
 import { PrismaService } from 'src/config/prisma/prisma.service';
+import { CreateCountryRequest } from 'src/contracts/create-country.request';
 import { CountryDto } from 'src/contracts/dtos/country.dto';
+import { RegionDto } from 'src/contracts/dtos/region.dto';
 import { mapCountryToDto } from 'src/mappers/country.mapper';
 
 @Injectable()
 export class CountryService {
     constructor(
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService,
     ) { }
 
     async findCountryById(countryId: string) {
@@ -29,18 +32,30 @@ export class CountryService {
         return mapCountryToDto(country);
     }
 
-    async create(name: string): Promise<CountryDto> {
+    async create(request: CreateCountryRequest): Promise<CountryDto> {
+        const extendedPrismas = this.prisma.$extends(createRegionExtension);
+
         try {
-            const country = await this.prisma.country.create({
+            const country = await extendedPrismas.country.create({
                 data: {
-                    name
+                    name: request.name
                 },
                 include: {
                     region: true,
                 }
             });
 
-            return mapCountryToDto(country);
+            const regions = await Promise.all(request.regions?.map(async region => {
+                return await extendedPrismas.region.create({
+                    name: region.name,
+                    province: region.province,
+                    lat: region.lat,
+                    lon: region.lon,
+                    country_id: country.id
+                })
+            }));
+
+            return mapCountryToDto(country, regions);
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 throw new UniqueConstraintError("Country already exists");

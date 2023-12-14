@@ -5,8 +5,8 @@ export const regionSchema = z
     .object({
         name: nameValidator("Name"),
         province: nameValidator("Province"),
-        lat: z.number(),
-        lon: z.number(),
+        lat: z.number().min(-90).max(90),
+        lon: z.number().min(-180).max(180),
     })
     .required();
 

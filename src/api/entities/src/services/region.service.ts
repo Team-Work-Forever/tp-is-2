@@ -33,7 +33,6 @@ export class RegionService {
 
             return mapRegionDaoToDto(region);
         } catch (error) {
-            console.log(error);
         }
     }
 

@@ -17,7 +17,7 @@ export class CountryController {
     public async createCountry(
         @Body() request: CreateCountryRequest,
         @Res() response: Response): Promise<Response<CountryDto>> {
-        const country = await this.countryService.create(request.name);
+        const country = await this.countryService.create(request);
 
         return response
             .status(201).send(country);

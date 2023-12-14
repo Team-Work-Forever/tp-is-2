@@ -34,7 +34,6 @@ export class RegionController {
         @Param("countryId", new UuidPipe()) { id: countryId },
         @Param("regionId", new UuidPipe()) { id: regionId },
         @Res() response: Response) {
-        console.log(countryId, regionId);
 
         const regions = await this.regionService.findByRegionId(countryId, regionId);
 
