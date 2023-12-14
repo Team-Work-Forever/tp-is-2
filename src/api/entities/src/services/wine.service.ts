@@ -7,6 +7,7 @@ import { NotFoundError } from 'errors/not-found.error';
 import { Prisma } from '@prisma/client';
 import { UniqueConstraintError } from 'errors/unique-contraint.error';
 import { ReviewService } from './review.service';
+import { ConflitError } from 'errors/confilt.error';
 
 @Injectable()
 export class WineService {
@@ -17,6 +18,17 @@ export class WineService {
 
     async deleteWine(wineId: string) {
         await this.findWineById(wineId);
+
+        const qtyReviews = await this.prisma.review.count({
+            where: {
+                wine_id: wineId,
+                deleted_at: null,
+            }
+        });
+
+        if (qtyReviews > 0) {
+            throw new ConflitError("Cannot delete a wine with reviews, delete the reviews first");
+        }
 
         const wine = await this.prisma.wine.delete({
             where: {

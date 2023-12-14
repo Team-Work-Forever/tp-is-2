@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { ConflitError } from 'errors/confilt.error';
 import { NotFoundError } from 'errors/not-found.error';
 import { UniqueConstraintError } from 'errors/unique-contraint.error';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
@@ -81,6 +82,21 @@ export class CountryService {
     async deleteCountry(countryId: string): Promise<CountryDto> {
         const extendedPrismas = this.prisma.$extends(createRegionExtension);
         await this.findCountryById(countryId);
+
+        const qtyRegions = await extendedPrismas.country.count({
+            where: {
+                id: countryId,
+                region: {
+                    some: {
+                        deleted_at: null
+                    }
+                }
+            }
+        })
+
+        if (qtyRegions > 0) {
+            throw new ConflitError("It's not possible to remove an Country with Regions associated to it. Please remove the Regions first and try again.");
+        }
 
         const country = await extendedPrismas.country.delete({
             where: {

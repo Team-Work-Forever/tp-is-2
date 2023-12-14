@@ -4,8 +4,8 @@ import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapRegionDaoToDto, mapRegionToDto } from 'src/mappers/region.mapper';
 import { CountryService } from './country.service';
 import { CreateRegionRequest } from 'src/contracts/create-region.request';
-import { PrismaClient } from '@prisma/client';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
+import { ConflitError } from 'errors/confilt.error';
 
 type CreateRegion = CreateRegionRequest & {
     countryId: string;
@@ -37,17 +37,12 @@ export class RegionService {
     }
 
     async findAll(countryId: string) {
+        const extendedPrisma = this.prisma.$extends(createRegionExtension);
         await this.countryService.findCountryById(countryId);
 
-        const regions = await this.prisma.region.findMany({
-            where: {
-                country: {
-                    id: countryId,
-                }
-            }
-        });
+        const regions = await extendedPrisma.region.fetchManyByCountryId(countryId);
 
-        return regions.map(region => mapRegionToDto(region));
+        return regions.map(region => mapRegionDaoToDto(region));
     }
 
     async findByRegionId(countryId: string, regionId: string) {
@@ -66,7 +61,23 @@ export class RegionService {
     }
 
     async deleteRegionById(countryId: string, regionId: string) {
+        const extendedPrisma = this.prisma.$extends(createRegionExtension);
         await this.findByRegionId(countryId, regionId);
+
+        const qtyWines = await extendedPrisma.region.count({
+            where: {
+                id: regionId,
+                wine: {
+                    some: {
+                        deleted_at: null
+                    }
+                }
+            }
+        });
+
+        if (qtyWines > 0) {
+            throw new ConflitError("It's not possible to remove a Region with Wines associated to it. Please remove the Wines first and try again.");
+        }
 
         const region = await this.prisma.region.delete({
             where: {

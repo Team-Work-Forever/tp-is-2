@@ -6,6 +6,7 @@ import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapReviewToDto } from 'src/mappers/review.mapper';
 import { mapTasterToDto } from 'src/mappers/taster.mapper';
 import { ReviewService } from './review.service';
+import { ConflitError } from 'errors/confilt.error';
 
 @Injectable()
 export class TasterService {
@@ -16,6 +17,16 @@ export class TasterService {
 
     async deleteTaster(tasterId: string) {
         await this.findByTasterId(tasterId);
+
+        const qtyReviews = await this.prisma.review.count({
+            where: {
+                taster_id: tasterId
+            }
+        });
+
+        if (qtyReviews > 0) {
+            throw new ConflitError("Cannot delete a taster with reviews, delete the reviews first");
+        }
 
         const taster = await this.prisma.taster.delete({
             where: {
@@ -30,7 +41,8 @@ export class TasterService {
 
         const taster = await this.prisma.taster.findFirst({
             where: {
-                id: tasterId
+                id: tasterId,
+                deleted_at: null,
             }
         });
 
@@ -42,7 +54,11 @@ export class TasterService {
     }
 
     async findAll() {
-        const tasters = await this.prisma.taster.findMany();
+        const tasters = await this.prisma.taster.findMany({
+            where: {
+                deleted_at: null,
+            }
+        });
 
         return tasters.map(taster => mapTasterToDto(taster));
     }

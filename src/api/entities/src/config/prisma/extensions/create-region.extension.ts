@@ -68,7 +68,7 @@ export default Prisma.defineExtension((prisma) => {
                             ST_Y(coordinates::geometry) as lon, 
                             country_id as country, 
                             created_at, 
-                            updated_at FROM "region" WHERE id = ${regionId}::uuid;
+                            updated_at FROM "region" WHERE id = ${regionId}::uuid and deleted_at is null;
                     `;
 
                     return response[0] as RegionDao;
@@ -85,7 +85,7 @@ export default Prisma.defineExtension((prisma) => {
                             ST_Y(coordinates::geometry) as lon, 
                             country_id as country, 
                             created_at, 
-                            updated_at FROM "region" where country_id = ${countryId}::uuid;
+                            updated_at FROM "region" where country_id = ${countryId}::uuid and deleted_at is null;
                     `;
 
                     return response as RegionDao[];
