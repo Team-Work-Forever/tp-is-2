@@ -12,6 +12,7 @@ CREATE TABLE public.converted_documents (
     src             VARCHAR(250) UNIQUE NOT NULL,
     file_size       BIGINT NOT NULL,
     dst             VARCHAR(250) UNIQUE NOT NULL,
+	checksum 	  VARCHAR(250) UNIQUE NOT NULL,
 	created_on      TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_on      TIMESTAMP NOT NULL DEFAULT NOW()
 );

@@ -27,7 +27,6 @@ class CSVHandler(FileSystemEventHandler):
             self.dispatch(event)
 
     def __generate_unique_file_name(self, directory: str):
-
         # if not exists create the directory
         if not os.path.exists(directory):
             os.makedirs(directory)
