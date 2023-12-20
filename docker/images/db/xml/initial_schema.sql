@@ -16,3 +16,15 @@ CREATE TABLE public.converted_documents (
 	created_on      TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_on      TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+create or replace function public.notify_insert_tr()
+    returns trigger as $$
+begin
+    perform pg_notify('watch_channel', new.xml::text);
+    return new;
+end;
+$$ language plpgsql;
+
+create or replace trigger insert_tr
+    after insert on public.imported_documents
+    for each row execute procedure public.notify_insert_tr();
