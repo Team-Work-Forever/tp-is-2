@@ -200,6 +200,13 @@ services:
     environment:
       USE_DEV_MODE: ${USE_DEV_MODE}
 
+  redis-borker:
+    container_name: redis
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
   broker:
     container_name: rabbitmq
     image: "rabbitmq:3.12.9-management-alpine"
