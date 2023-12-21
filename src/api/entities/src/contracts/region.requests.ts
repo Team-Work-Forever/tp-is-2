@@ -3,14 +3,15 @@ import { z } from "zod";
 
 export const regionSchema = z
     .object({
-        name: nameValidator("Name"),
+        name: nameValidator("Name").optional(),
         province: nameValidator("Province"),
         lat: z.number().min(-90).max(90),
         lon: z.number().min(-180).max(180),
     })
     .required();
 
-export type CreateRegionRequest = z.infer<typeof regionSchema>;
+export const regionSchemaArray = z.array(regionSchema);
+export type CreateRegionRequest = z.infer<typeof regionSchemaArray>;
 
 export const updateRegionSchema = z
     .object({

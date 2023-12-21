@@ -3,15 +3,16 @@ import { NotFoundError } from 'errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapRegionDaoToDto, mapRegionToDto } from 'src/mappers/region.mapper';
 import { CountryService } from './country.service';
-import { CreateRegionRequest } from 'src/contracts/region.requests';
+import { CreateRegionRequest, UpdateRegionRequest } from 'src/contracts/region.requests';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
 import { ConflitError } from 'errors/confilt.error';
 
-type CreateRegion = CreateRegionRequest & {
+type CreateRegion = {
+    request: CreateRegionRequest;
     countryId: string;
 }
 
-type UpdateRegion = CreateRegionRequest & {
+type UpdateRegion = UpdateRegionRequest & {
     countryId: string;
     regionId: string;
 }
@@ -24,21 +25,24 @@ export class RegionService {
         private readonly countryService: CountryService,
     ) { }
 
-    async createRegion(request: CreateRegion) {
-        await this.countryService.findCountryById(request.countryId);
+    async createRegion(data: CreateRegion) {
+        await this.countryService.findCountryById(data.countryId);
         const extendedPrisma = this.prisma.$extends(createRegionExtension);
 
         try {
-            const region = await extendedPrisma.region.create({
-                name: request.name,
-                province: request.province,
-                lat: request.lat,
-                lon: request.lon,
-                country_id: request.countryId,
-            });
+            return await Promise.all(data.request.map(async region => {
+                const regionDAO = await extendedPrisma.region.create({
+                    name: region.name,
+                    province: region.province,
+                    lat: region.lat,
+                    lon: region.lon,
+                    country_id: data.countryId
+                })
 
-            return mapRegionDaoToDto(region);
+                return mapRegionDaoToDto(regionDAO);
+            }));
         } catch (error) {
+            throw new ConflitError("Already exists a Region with this name.");
         }
     }
 
@@ -49,20 +53,16 @@ export class RegionService {
         console.log(request);
 
 
-        try {
-            const region = await extendedPrisma.region.update({
-                id: request.regionId,
-                name: request.name,
-                province: request.province,
-                lat: request.lat,
-                lon: request.lon,
-                country_id: request.countryId,
-            });
+        const region = await extendedPrisma.region.update({
+            id: request.regionId,
+            name: request.name,
+            province: request.province,
+            lat: request.lat,
+            lon: request.lon,
+            country_id: request.countryId,
+        });
 
-            return mapRegionDaoToDto(region);
-        } catch (error) {
-            console.log(error);
-        }
+        return mapRegionDaoToDto(region);
     }
 
     async findAll(countryId: string) {
