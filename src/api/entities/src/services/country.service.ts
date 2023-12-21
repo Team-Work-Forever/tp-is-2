@@ -38,6 +38,25 @@ export class CountryService {
         return mapCountryToDto(country, await extendedPrismas.region.fetchManyByCountryId(country.id));
     }
 
+    async findCountryByName(countryName: string) {
+        const extendedPrismas = this.prisma.$extends(createRegionExtension);
+
+        const country = await extendedPrismas.country.findFirst({
+            where: {
+                name: countryName
+            },
+            include: {
+                region: true,
+            }
+        });
+
+        if (country === null) {
+            throw new NotFoundError("Country not found");
+        }
+
+        return mapCountryToDto(country, await extendedPrismas.region.fetchManyByCountryId(country.id));
+    }
+
     async create(request: CreateCountryRequest): Promise<CountryDto> {
         const extendedPrismas = this.prisma.$extends(createRegionExtension);
 
@@ -88,10 +107,15 @@ export class CountryService {
         return mapCountryToDto(country);
     }
 
-    async findAll() {
+    async findAll(name?: string): Promise<CountryDto[]> {
         const extendedPrismas = this.prisma.$extends(createRegionExtension);
 
         const countries = await extendedPrismas.country.findMany({
+            where: {
+                name: name ? {
+                    contains: name
+                } : undefined
+            },
             include: {
                 region: true,
             }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateCountryRequest, UpdateCountryRequest, countrySchema, updateCountrySchema } from 'src/contracts/country.requests';
 import { CountryDto } from 'src/contracts/dtos/country.dto';
@@ -35,8 +35,12 @@ export class CountryController {
     }
 
     @Get()
-    public async getCountries(@Res() response: Response) {
-        const countries = await this.countryService.findAll();
+    public async getCountries(
+        @Res() response: Response,
+        @Query("name") name?: string
+    ) {
+        const countries = await this
+            .countryService.findAll(name);
 
         return response
             .status(200).send(countries);

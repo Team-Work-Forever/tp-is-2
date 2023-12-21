@@ -12,7 +12,7 @@ export class RegionController {
     ) { }
 
     @Post()
-    public async createRegion(
+    public async AddRegions(
         @Body(new ZodValidationPipe(regionSchema)) request: CreateRegionRequest,
         @Param("countryId", new UuidPipe()) { id: countryId },
         @Res() response: Response) {
