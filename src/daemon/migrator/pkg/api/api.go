@@ -56,11 +56,6 @@ func (api *Api) post(path string, requestData interface{}) (*http.Response, erro
 	}
 	defer resp.Body.Close()
 
-	// responseBody, err := io.ReadAll(resp.Body)
-	// if err == nil {
-	// 	fmt.Println(string(responseBody))
-	// }
-
 	if resp.StatusCode != http.StatusCreated {
 		return resp, fmt.Errorf("unexpected status code %d", resp.StatusCode)
 	}
@@ -76,6 +71,10 @@ func (api *Api) get(path string, response interface{}) error {
 		return fmt.Errorf("failed to make GET request: %v", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status code %d", resp.StatusCode)

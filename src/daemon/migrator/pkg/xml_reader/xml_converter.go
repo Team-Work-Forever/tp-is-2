@@ -22,7 +22,7 @@ func NewXmlReader() *XmlReader {
 
 func (xr *XmlReader) DecodeResponse(reader string) (*entities.WineReviews, error) {
 	var wineReview entities.WineReviews
-	// Rewind the reader to the beginning using a buffer
+
 	doc, err := xmlquery.Parse(strings.NewReader(reader))
 
 	if err != nil {
@@ -44,7 +44,23 @@ func (xr *XmlReader) DecodeResponse(reader string) (*entities.WineReviews, error
 
 		if result != nil {
 			wineReview.Wines[i].RegionName = result.InnerText()
-			// fmt.Printf("xpathExpr: %s\n", wineReview.Wines[i].RegionName)
+		}
+	}
+
+	// Populate the twitter handle and wine title
+	for i := range wineReview.Wines {
+		xpath := fmt.Sprintf("/WineReviews/Tasters/Taster[@id=\"%s\"]/@twitter_handle", wineReview.Reviews[i].TasterId)
+		result := xmlquery.FindOne(doc, xpath)
+
+		if result != nil {
+			wineReview.Reviews[i].TwitterHandle = result.InnerText()
+		}
+
+		xpath = fmt.Sprintf("/WineReviews/Wines/Wine[@id=\"%s\"]/@title", wineReview.Reviews[i].WineId)
+		result = xmlquery.FindOne(doc, xpath)
+
+		if result != nil {
+			wineReview.Reviews[i].WineTitle = result.InnerText()
 		}
 	}
 

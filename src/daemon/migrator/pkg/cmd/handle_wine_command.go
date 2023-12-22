@@ -10,17 +10,17 @@ type HandleWineCommand struct {
 	Api *api.Api
 }
 
-func (c *HandleWineCommand) Execute(entity interface{}) (string, error) {
+func (c *HandleWineCommand) Execute(entity interface{}) error {
 	wine, ok := entity.(entities.Wine)
 
 	if !ok {
-		return "", fmt.Errorf("expected wine, got %T", entity)
+		return fmt.Errorf("expected wine, got %T", entity)
 	}
 
 	// Create wine
 	if err := c.Api.CreateWine(&wine); err != nil {
-		return "", err
+		return err
 	}
 
-	return "", nil
+	return nil
 }

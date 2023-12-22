@@ -8,5 +8,6 @@ type Wine struct {
 	RegionId    string  `xml:"region_id,attr"`
 	Varaiety    string  `xml:"variety,attr" json:"variety"`
 	Winery      string  `xml:"winery,attr" json:"winery"`
+	Title       string  `xml:"title,attr" json:"title"`
 	RegionName  string  `json:"region"`
 }

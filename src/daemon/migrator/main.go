@@ -33,7 +33,6 @@ func main() {
 }
 
 func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
-	// Create CommandExcetuer
 	executer := cmd.NewCommandExecuter()
 
 	messages, channel, err := rabbitqm.ConsumeMessages()
@@ -45,6 +44,8 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, os.Interrupt, syscall.SIGTERM)
+
+	log.Println("Started to Listen for messages...")
 
 	for {
 		select {
@@ -61,17 +62,14 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 				log.Fatalf("Error getting value from Redis: %s", err.Error())
 			}
 
-			// TODO: Make turn this into a reader
-			// xmlReader := strings.NewReader(xmlValue)
 			xml_reader := xml_reader.NewXmlReader()
-
 			wineReviews, err := xml_reader.DecodeResponse(xmlValue)
 
 			if err != nil {
 				log.Fatalf("Error decoding XML: %s", err.Error())
 			}
 
-			// // Execute command
+			// Execute command
 			executer.Handle(wineReviews)
 
 		case <-signalCh:

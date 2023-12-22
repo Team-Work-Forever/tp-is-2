@@ -43,6 +43,5 @@ func (api *Api) AddRegionsToCountry(country *entities.Country) error {
 		return err
 	}
 
-	fmt.Printf("Regions were inserted!\n\n")
 	return nil
 }

@@ -4,27 +4,28 @@ import (
 	"fmt"
 	"migrator/pkg/xml_reader/entities"
 	"net/http"
+	"net/url"
 )
 
 type WineResponse struct {
 	Id string `json:"id"`
 }
 
-// func (api *Api) GetWineById(twitter_handle string) (*WineResponse, error) {
-// 	var wineIds []WineResponse
+func (api *Api) GetWineIfExists(title string) (*WineResponse, error) {
+	var wineId []WineResponse
 
-// 	err := api.get(fmt.Sprintf("wines?twitter_handle=%s", twitter_handle), &wineIds)
+	err := api.get(fmt.Sprintf("wines?title=%s", url.QueryEscape(title)), &wineId)
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if err != nil {
+		return nil, err
+	}
 
-// 	if len(wineIds) == 0 {
-// 		return nil, NotFoundError{fmt.Sprintf("wine %s not found", twitter_handle)}
-// 	}
+	if len(wineId) == 0 {
+		return nil, NotFoundError{fmt.Sprintf("Wine %s not found", title)}
+	}
 
-// 	return &wineIds[0], nil
-// }
+	return &wineId[0], nil
+}
 
 func (api *Api) CreateWine(wine *entities.Wine) error {
 	if response, err := api.post("wines", wine); err != nil {

@@ -8,7 +8,7 @@ import (
 )
 
 type Command interface {
-	Execute(entity interface{}) (string, error)
+	Execute(entity interface{}) error
 }
 
 type CommandExecuter struct {
@@ -23,16 +23,18 @@ func NewCommandExecuter() *CommandExecuter {
 		Api: api,
 		Commands: map[reflect.Type]Command{
 			reflect.TypeOf(&entities.Country{}): &HandleCountryCommand{Api: api},
-			reflect.TypeOf(&entities.Taster{}):  &HandleTasterCommand{Api: api},
 			reflect.TypeOf(&entities.Wine{}):    &HandleWineCommand{Api: api},
+			reflect.TypeOf(&entities.Taster{}):  &HandleTasterCommand{Api: api},
+			reflect.TypeOf(&entities.Review{}):  &HandleReviewCommand{Api: api},
 		},
 	}
 }
 
 func (ce *CommandExecuter) Handle(wineReviews *entities.WineReviews) {
 	ce.handle_list(wineReviews.Countries)
-	ce.handle_list(wineReviews.Tasters)
 	ce.handle_list(wineReviews.Wines)
+	ce.handle_list(wineReviews.Tasters)
+	ce.handle_list(wineReviews.Reviews)
 }
 
 func (ce *CommandExecuter) handle_list(entities interface{}) error {
@@ -56,12 +58,6 @@ func (ce *CommandExecuter) handle_list(entities interface{}) error {
 		if !ok {
 			return fmt.Errorf("unsupported entity type")
 		}
-
-		// run command
-		// if _, err := cmd.Execute(entity); err != nil {
-		// 	// fmt.Println("Error executing command:", err)
-		// 	// return err
-		// }
 
 		cmd.Execute(entity)
 	}
