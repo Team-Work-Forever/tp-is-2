@@ -7,9 +7,9 @@ class Taster(Entity):
         super().__init__("taster")
 
         self._name = name
-        self._twitter_handle = self._defualt_twitter_handle(twitter_handle, name)
+        self._twitter_handle = self._default_twitter_handle(twitter_handle, name)
 
-    def _defualt_twitter_handle(self, value: str, name: str):
+    def _default_twitter_handle(self, value: str, name: str):
         if value != "":
             return value
 

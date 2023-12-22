@@ -7,10 +7,16 @@ class Region(Entity):
         super().__init__("region")
 
         self._country_id = country_id
-        self._region = region
+        self._region = self._default_region(region, province)
         self._province = province
         self._lat = 0
         self._lon = 0
+
+    def _default_region(self, value: str, province: str):
+        if value != "":
+            return value
+
+        return province
 
     def get_country_id(self):
         return self._country_id

@@ -17,6 +17,7 @@ class XmlExporter():
         el.set("region_id", str(wine.get_region_id()))
         el.set("variaty", str(wine.get_variaty()))
         el.set("winery", str(wine.get_winery()))
+        el.set("title", str(wine.get_title()))
 
         return el
 

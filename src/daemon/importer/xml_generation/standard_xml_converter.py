@@ -60,7 +60,8 @@ class CSVtoXMLConverter:
                     self._countries[row["country"]].get_id(),
                     self._regions[self.get_composite_key(row["region_1"], row["region_2"])].get_id(),
                     row["variety"],
-                    row["winery"])
+                    row["winery"],
+                    row["title"])
             )
     
     def read_taster(self):
