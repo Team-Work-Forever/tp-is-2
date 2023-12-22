@@ -24,6 +24,7 @@ func NewCommandExecuter() *CommandExecuter {
 		Commands: map[reflect.Type]Command{
 			reflect.TypeOf(&entities.Country{}): &HandleCountryCommand{Api: api},
 			reflect.TypeOf(&entities.Taster{}):  &HandleTasterCommand{Api: api},
+			reflect.TypeOf(&entities.Wine{}):    &HandleWineCommand{Api: api},
 		},
 	}
 }
@@ -31,6 +32,7 @@ func NewCommandExecuter() *CommandExecuter {
 func (ce *CommandExecuter) Handle(wineReviews *entities.WineReviews) {
 	ce.handle_list(wineReviews.Countries)
 	ce.handle_list(wineReviews.Tasters)
+	ce.handle_list(wineReviews.Wines)
 }
 
 func (ce *CommandExecuter) handle_list(entities interface{}) error {
@@ -56,10 +58,12 @@ func (ce *CommandExecuter) handle_list(entities interface{}) error {
 		}
 
 		// run command
-		if _, err := cmd.Execute(entity); err != nil {
-			fmt.Println("Error executing command:", err)
-			return err
-		}
+		// if _, err := cmd.Execute(entity); err != nil {
+		// 	// fmt.Println("Error executing command:", err)
+		// 	// return err
+		// }
+
+		cmd.Execute(entity)
 	}
 
 	return nil

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"migrator/pkg/api"
 	"migrator/pkg/xml_reader/entities"
 )
@@ -18,8 +17,6 @@ func (c *HandleCountryCommand) Execute(entity interface{}) (string, error) {
 		return "", fmt.Errorf("expected Country, got %T", entity)
 	}
 
-	log.Println("Converting Country:", country.Name)
-
 	// Check if Country exists, and retrive the Country Id
 	existingCountry, err := c.Api.GetCountryIfExists(country.Name)
 
@@ -27,17 +24,14 @@ func (c *HandleCountryCommand) Execute(entity interface{}) (string, error) {
 		if _, notFound := err.(api.NotFoundError); notFound {
 			// Country not found, create it
 			if err := c.Api.CreateCountry(&country); err != nil {
-				return "", err
+				if _, ok := err.(api.AlreadyExistsError); !ok {
+					return "", err
+				}
 			}
-
-			fmt.Println("Create country:", country.Name)
 		}
 
 		return "", nil
 	}
-
-	// Update Country
-	fmt.Println("Updating Country:", existingCountry.Id)
 
 	// Tris to insert regions, if fails, it means that they already exist. So, we can ignore the error
 	country.Id = existingCountry.Id
@@ -45,9 +39,6 @@ func (c *HandleCountryCommand) Execute(entity interface{}) (string, error) {
 		if _, ok := err.(api.AlreadyExistsError); !ok {
 			return "", err
 		}
-
-		fmt.Println("Regions were inserted!")
-		fmt.Println()
 	}
 
 	return "", nil

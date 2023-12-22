@@ -8,7 +8,6 @@ import (
 	"migrator/pkg/xml_reader"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 )
 
@@ -62,11 +61,11 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 				log.Fatalf("Error getting value from Redis: %s", err.Error())
 			}
 
-			xmlReader := strings.NewReader(xmlValue)
-
+			// TODO: Make turn this into a reader
+			// xmlReader := strings.NewReader(xmlValue)
 			xml_reader := xml_reader.NewXmlReader()
 
-			wineReviews, err := xml_reader.DecodeResponse(xmlReader)
+			wineReviews, err := xml_reader.DecodeResponse(xmlValue)
 
 			if err != nil {
 				log.Fatalf("Error decoding XML: %s", err.Error())

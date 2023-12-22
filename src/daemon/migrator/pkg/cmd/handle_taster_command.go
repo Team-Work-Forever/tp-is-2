@@ -17,13 +17,10 @@ func (c *HandleTasterCommand) Execute(entity interface{}) (string, error) {
 		return "", fmt.Errorf("expected Taster, got %T", entity)
 	}
 
-	fmt.Printf("Converting Taster: %s, %s", taster.TwitterHandle, taster.Name)
-
 	// Persist Taster, eventhough it is may exist
 	if err := c.Api.CreateTaster(&taster); err != nil {
 		return "", err
 	}
 
-	fmt.Println("Taster was created:", taster.Name)
 	return "", nil
 }
