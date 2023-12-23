@@ -1,14 +1,15 @@
 from xmlrpc.client import ServerProxy
 
 from helpers import SingletonMeta
+from utils import Env
 
 class RPConnection(metaclass=SingletonMeta):
     def __init__(self) -> None:
         self._connect()
 
     def _connect(self):
-        host = 'localhost'
-        port = 9000
+        host = Env.get_var('RPC_SERVER_HOST')
+        port = Env.get_var('RPC_SERVER_PORT')
 
         try:
             self._connection = ServerProxy(f'http://{host}:{port}')
