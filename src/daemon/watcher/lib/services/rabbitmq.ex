@@ -1,11 +1,14 @@
-defmodule Watcher.RabbitMQ do
+defmodule Watcher.Services.RabbitMQ do
+  require Poison
   alias AMQP.Connection
   alias AMQP.Channel
   alias AMQP.Queue
   alias AMQP.Exchange
   alias AMQP.Basic
 
-  @rabbit_config Application.compile_env(:watcher, Watcher.RabbitMQ)
+  require Logger
+
+  @rabbit_config Application.compile_env(:watcher, Watcher.Services.RabbitMQ)
 
   @spec setup_connection() :: {:ok, AMQP.Channel.t()}
   def setup_connection() do
@@ -38,21 +41,21 @@ defmodule Watcher.RabbitMQ do
 
   @spec create_and_bind_queue(AMQP.Channel.t()) :: :ok
   defp create_and_bind_queue(channel) do
-    exchange = Keyword.get(@rabbit_config, :exchange)
-    queue = Keyword.get(@rabbit_config, :queue)
-    routing_key = Keyword.get(@rabbit_config, :routing_key)
+    queues = Keyword.get(@rabbit_config, :queues)
 
-    Queue.declare(channel, queue)
-    Exchange.declare(channel, exchange)
-    Queue.bind(channel, queue, exchange, routing_key: routing_key)
+    Enum.each(queues, fn {queue, exchange, routing_key} ->
+      Queue.declare(channel, queue)
+      Exchange.declare(channel, exchange)
+      Queue.bind(channel, queue, exchange, routing_key: routing_key)
+    end)
   end
 
-  @spec publish_message(AMQP.Channel.t(), binary()) :: :ok | {:error, :blocked | :closing}
-  def publish_message(channel, message) do
+  @spec publish_message(AMQP.Channel.t(), String.t(), any()) ::
+          :ok | {:error, :blocked | :closing}
+  def publish_message(channel, router_key, message) do
     exchange = Keyword.get(@rabbit_config, :exchange)
-    queue = Keyword.get(@rabbit_config, :queue)
 
-    Basic.publish(channel, queue, exchange, message)
+    Basic.publish(channel, exchange, router_key, Poison.encode!(message))
   end
 
   @spec close_connection(AMQP.Channel.t()) :: :ok | {:error, {:error, :blocked | :closing}}

@@ -23,7 +23,6 @@ defmodule Watcher.NotificationListener do
     # Configure RabbitMq
     {:ok, rabbitMq_channel} = connect_to_rabbitMQ()
 
-    Logger.info("Watching started...")
     {:ok, {rabbitMq_channel, redis_connection}}
   end
 
@@ -80,18 +79,28 @@ defmodule Watcher.NotificationListener do
               lat: region.lat,
               lng: region.lon
             })
+
+            # Logger.debug("Publishing postgis coordinates: #{inspect(region)}")
           end)
 
           Watcher.Services.RabbitMQ.publish_message(rabbitMq_channel, "create-country", entity)
 
+        # Logger.debug("Publishing country: #{inspect(entity)}")
+
         %XmlParser.Entities.Taster{} ->
           Watcher.Services.RabbitMQ.publish_message(rabbitMq_channel, "create-taster", entity)
+
+        # Logger.debug("Publishing taster: #{inspect(entity)}")
 
         %XmlParser.Entities.Wine{} ->
           Watcher.Services.RabbitMQ.publish_message(rabbitMq_channel, "create-wine", entity)
 
+        # Logger.debug("Publishing wine: #{inspect(entity)}")
+
         %XmlParser.Entities.Review{} ->
           Watcher.Services.RabbitMQ.publish_message(rabbitMq_channel, "create-review", entity)
+
+        # Logger.debug("Publishing review: #{inspect(entity)}")
 
         _ ->
           Logger.error("Unknown entity: #{inspect(entity)}")
@@ -103,10 +112,45 @@ defmodule Watcher.NotificationListener do
 
   def handle_info({:notification, _pid, _ref, @channel, payload}, state) do
     rabbitMq_channel = elem(state, 0)
+    # redis_connection = elem(state, 1)
+
     Logger.debug("Received a notification...")
+
+    # Publish on Redis new xml
+    # process_id = Ecto.UUID.generate()
+
+    # case Watcher.Redis.set_value(redis_connection, "#{process_id}", payload) do
+    #   {:ok, _} ->
+    #     Logger.debug("Published on Redis: #{process_id}")
+
+    #   {:error, reason} ->
+    #     Logger.error("Error publishing on Redis: #{reason}")
+    #     {:noreply, state}
+    # end
 
     entities = XmlParser.Parser.parse(payload)
     process_entities(entities, rabbitMq_channel)
+
+    # # Publish on RabbitMQ
+    # case Watcher.RabbitMQ.publish_message(rabbitMq_channel, "#{process_id}") do
+    #   :ok ->
+    #     Logger.debug("Published on RabbitMQ: #{process_id}")
+
+    #   {:error, reason} ->
+    #     Logger.error("Error publishing on RabbitMQ: #{reason}")
+
+    #     # Remove from Redis
+    #     case Watcher.Redis.remove_value(redis_connection, "#{process_id}") do
+    #       {:ok, _} ->
+    #         Logger.debug("Removed from Redis: #{process_id}")
+
+    #       {:error, reason} ->
+    #         Logger.error("Error removing from Redis: #{reason}")
+    #         {:noreply, state}
+    #     end
+
+    #     {:noreply, state}
+    # end
 
     {:noreply, state}
   end

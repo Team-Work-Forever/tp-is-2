@@ -25,7 +25,9 @@ defmodule Watcher.MixProject do
       {:ecto_sql, "~> 3.11"},
       {:postgrex, "~> 0.17.4"},
       {:amqp, "~> 3.3"},
-      {:redix, "~> 1.3"}
+      {:redix, "~> 1.3"},
+      {:sweet_xml, "~> 0.7.4"},
+      {:poison, "~> 5.0"}
     ]
   end
 end
