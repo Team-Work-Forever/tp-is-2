@@ -14,7 +14,7 @@ CREATE TABLE public.country (
 CREATE TABLE public.region (
     id uuid DEFAULT uuid_generate_v4(),
     name varchar(25) NOT NULL UNIQUE,
-    province varchar(50) NOT NULL UNIQUE,
+    province varchar(50) NOT NULL,
     coordinates GEOMETRY(Point, 4326),
     country_id uuid NOT NULL,
     created_at TIMESTAMP DEFAULT now(),
@@ -39,9 +39,10 @@ CREATE TABLE public.taster (
 CREATE TABLE public.wine (
     id uuid DEFAULT uuid_generate_v4(),
     price float NOT NULL,
-    designation varchar(100) NOT NULL,
+    designation text NOT NULL,
     variety varchar(50) NOT NULL,
     winery varchar(50) NOT NULL,
+    title varchar(100) NOT NULL,
     region_id uuid NOT NULL,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now(),
@@ -55,7 +56,7 @@ CREATE TABLE public.wine (
 CREATE TABLE public.review (
     id uuid DEFAULT uuid_generate_v4(),
     points int NOT NULL,
-    description varchar(100) NOT NULL,
+    description text NOT NULL,
     taster_id uuid NOT NULL,
     wine_id uuid NOT NULL,
     created_at TIMESTAMP DEFAULT now(),
