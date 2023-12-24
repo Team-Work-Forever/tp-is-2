@@ -52,10 +52,15 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 			if !ok {
 				return
 			}
+			// _ := string(message.Body)
+			// xmlValue, err := redis.GetValue(redisId)
 
 			if err != nil {
 				log.Fatalf("Error getting value from Redis: %s", err.Error())
 			}
+
+			// xml_reader := xml_reader.NewXmlReader()
+			// wineReviews, err := xml_reader.DecodeResponse(xmlValue)
 
 			if err != nil {
 				log.Fatalf("Error decoding XML: %s", err.Error())

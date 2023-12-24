@@ -30,7 +30,7 @@ func (api *Api) GetWineIfExists(title string) (*WineResponse, error) {
 func (api *Api) CreateWine(wine *entities.Wine) error {
 	if response, err := api.post("wines", wine); err != nil {
 		if response.StatusCode == http.StatusConflict {
-			return AlreadyExistsError{fmt.Sprintf("Wine %s was already created.", wine.Title)}
+			return AlreadyExistsError{fmt.Sprintf("Wine %s was already created.", wine.Id)}
 		}
 
 		return err

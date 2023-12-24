@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"encoding/json"
 	"migrator/pkg/api"
 	"migrator/pkg/xml_reader/entities"
 )
@@ -10,11 +10,18 @@ type HandleReviewCommand struct {
 	Api *api.Api
 }
 
-func (c *HandleReviewCommand) Execute(entity interface{}) error {
-	review, ok := entity.(entities.Review)
+type ReviewResponse struct {
+	Points            int    `json:"points"`
+	ReviewDescription string `json:"description"`
+	WineTitle         string `json:"wine_title"`
+	TwitterHandle     string `json:"twitter_handle"`
+}
 
-	if !ok {
-		return fmt.Errorf("expected wine, got %T", entity)
+func (c *HandleReviewCommand) Execute(entity []byte) error {
+	var review ReviewResponse
+
+	if err := json.Unmarshal(entity, &review); err != nil {
+		return err
 	}
 
 	// Get wine
@@ -25,8 +32,12 @@ func (c *HandleReviewCommand) Execute(entity interface{}) error {
 	}
 
 	// Create wine
-	review.WineId = wine.Id
-	if err := c.Api.CreateReview(&review); err != nil {
+	if err := c.Api.CreateReview(&entities.Review{
+		Points:            review.Points,
+		ReviewDescription: review.ReviewDescription,
+		TwitterHandle:     review.TwitterHandle,
+		WineId:            wine.Id,
+	}); err != nil {
 		return err
 	}
 
