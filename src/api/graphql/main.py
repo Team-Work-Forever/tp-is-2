@@ -1,22 +1,23 @@
 import sys
 
+from helpers import Env
+
 from flask import Flask
-import magql
-from flask_magql import MagqlExtension
+from flask_graphql import GraphQLView
+from data.db_access import DbConnection
 
-schema = magql.Schema()
+Env.load()
+DbConnection()
 
-@schema.query.field(
-    "greet", "String!", args={"name": magql.Argument("String!", default="World")}
-)
-def resolve_greet(parent, info, **kwargs):
-    name = kwargs.pop("name")
-    return f"Hello, {name}!"
-
-magql_ext = MagqlExtension(schema)
+PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 7322
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
-magql_ext.init_app(app)
-app.run(host="0.0.0.0", port=sys.argv[1])
 
+from schema import query_schema
+app.add_url_rule(
+    "/graphql",
+    view_func=GraphQLView.as_view("graphql", schema=query_schema, graphiql=True),
+)
+
+app.config["DEBUG"] = True
+app.run(host="0.0.0.0", port=PORT)
