@@ -58,9 +58,15 @@ export class TasterService {
         return mapTasterToDto(taster);
     }
 
-    async findAll() {
+    async findAll(name?: string, twitterHandle?: string) {
         const tasters = await this.prisma.taster.findMany({
             where: {
+                name: {
+                    equals: name,
+                },
+                twitter_handle: {
+                    equals: twitterHandle,
+                },
                 deleted_at: null,
             }
         });

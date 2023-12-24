@@ -5,6 +5,7 @@ export interface WineDto {
     variety: string;
     winery: string;
     region: string;
+    title: string;
     createdAt: Date;
     updatedAt: Date;
 }

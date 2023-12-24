@@ -65,14 +65,20 @@ export class WineService {
         return mapWineToDto(wine);
     }
 
-    async findAll() {
-        const wines = await this.prisma.wine.findMany({ include: { region: true } });
+    async findAll(title?: string) {
+        const wines = await this.prisma.wine.findMany({
+            where: {
+                title: {
+                    equals: title,
+                }
+            }, include: { region: true }
+        });
 
         return wines.map(
             wine => mapWineToDto(wine));
     }
 
-    async create({ price, designation, variety, winery, region }: CreateWine) {
+    async create({ price, designation, variety, winery, title, region }: CreateWine) {
         try {
             const wine = await this.prisma.wine.create({
                 data: {
@@ -80,6 +86,7 @@ export class WineService {
                     designation: designation,
                     variety: variety,
                     winery: winery,
+                    title: title,
                     region: {
                         connect: {
                             name: region
@@ -94,7 +101,7 @@ export class WineService {
             return mapWineToDto(wine);
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
-                throw new UniqueConstraintError("This wine already exists");
+                throw new UniqueConstraintError(error.message);
             }
         }
     }

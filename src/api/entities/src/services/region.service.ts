@@ -29,8 +29,8 @@ export class RegionService {
         await this.countryService.findCountryById(data.countryId);
         const extendedPrisma = this.prisma.$extends(createRegionExtension);
 
-        try {
-            return await Promise.all(data.request.map(async region => {
+        return await Promise.all(data.request.map(async region => {
+            try {
                 const regionDAO = await extendedPrisma.region.create({
                     name: region.name,
                     province: region.province,
@@ -40,10 +40,11 @@ export class RegionService {
                 })
 
                 return mapRegionDaoToDto(regionDAO);
-            }));
-        } catch (error) {
-            throw new ConflitError("Already exists a Region with this name.");
-        }
+            } catch (error) {
+                throw new ConflitError(`${region.name} already exists => ${error.message}`);
+            }
+        }));
+
     }
 
     async updateRegion(request: UpdateRegion) {

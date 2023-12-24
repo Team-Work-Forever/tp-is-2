@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
-import { Response, response } from 'express';
-import { CreateRegionRequest, regionSchema, regionSchemaArray, updateRegionSchema } from 'src/contracts/region.requests';
+import { Response } from 'express';
+import { CreateRegionRequest, regionSchemaArray, updateRegionSchema } from 'src/contracts/region.requests';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { RegionService } from 'src/services/region.service';

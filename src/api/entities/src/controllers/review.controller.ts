@@ -5,20 +5,22 @@ import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { ReviewService } from 'src/services/review.service';
 
-@Controller('reviews')
+@Controller('wines/:wineId/reviews')
 export class ReviewController {
     constructor(
         private readonly reviewService: ReviewService,
     ) { }
 
     @Post()
-    @UsePipes(new ZodValidationPipe(reviewSchema))
-    public async create(@Body() request: CreateReviewRequest, @Res() response: Response) {
+    public async create(
+        @Body(new ZodValidationPipe(reviewSchema)) request: CreateReviewRequest,
+        @Param("wineId", new UuidPipe()) { id: wineId },
+        @Res() response: Response) {
         const review = await this.reviewService.createReview(
             request.points,
             request.description,
             request.twitterHandle,
-            request.wineId,
+            wineId,
         );
 
         return response.status(HttpStatus.CREATED).json(review);

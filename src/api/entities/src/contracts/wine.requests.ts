@@ -10,6 +10,7 @@ export const wineSchema = z
         variety: nameValidator("Variety"),
         winery: nameValidator("Winery"),
         region: nameValidator("Region"),
+        title: textValidator("Title"),
     })
     .required();
 

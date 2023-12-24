@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { TasterDto } from 'src/contracts/dtos/taster.dto';
@@ -20,7 +20,7 @@ export class TasterController {
             .createTaster(request.name, request.twitterHandle);
 
         return response
-            .status(200).send(taster);
+            .status(HttpStatus.CREATED).send(taster);
     }
 
     @Put(":tasterId")
@@ -36,12 +36,15 @@ export class TasterController {
     }
 
     @Get()
-    public async getAllTasters(@Res() response: Response): Promise<Response<TasterDto[]>> {
+    public async getAllTasters(
+        @Query('name') name: string,
+        @Query('twitter_handle') twitterHandle: string,
+        @Res() response: Response): Promise<Response<TasterDto[]>> {
         const tasters = await this.tasterService
-            .findAll();
+            .findAll(name, twitterHandle);
 
         return response
-            .status(200).send(tasters);
+            .status(HttpStatus.ACCEPTED).send(tasters);
     }
 
     @Get(':tasterId')
@@ -50,7 +53,7 @@ export class TasterController {
             .findByTasterId(tasterId);
 
         return response
-            .status(200).send(taster);
+            .status(HttpStatus.OK).send(taster);
     }
 
     @Delete(':tasterId')
@@ -59,7 +62,7 @@ export class TasterController {
             .deleteTaster(tasterId);
 
         return response
-            .status(200).send(taster);
+            .status(HttpStatus.OK).send(taster);
     }
 
     @Get(':tasterId/reviews')

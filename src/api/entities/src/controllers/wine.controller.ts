@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateWineRequest, UpdateWineRequest, updateWineSchema, wineSchema } from 'src/contracts/wine.requests';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
@@ -6,6 +6,7 @@ import { WineDto } from 'src/contracts/dtos/wine.dto';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { WineService } from 'src/services/wine.service';
+import { title } from 'process';
 
 @Controller('wines')
 export class WineController {
@@ -36,8 +37,10 @@ export class WineController {
     }
 
     @Get()
-    public async getWines(@Res() response: Response): Promise<Response<WineDto[]>> {
-        const wines = await this.wineService.findAll();
+    public async getWines(
+        @Query("title") title: string,
+        @Res() response: Response): Promise<Response<WineDto[]>> {
+        const wines = await this.wineService.findAll(title);
 
         return response
             .status(200).send(wines);

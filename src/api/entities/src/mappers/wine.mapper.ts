@@ -15,6 +15,7 @@ export function mapWineToDto(wine: WineOptions): WineDto {
         variety: wine.variety,
         winery: wine.winery,
         region: wine.region.name,
+        title: wine.title,
         createdAt: wine.created_at,
         updatedAt: wine.updated_at,
     } as WineDto;
