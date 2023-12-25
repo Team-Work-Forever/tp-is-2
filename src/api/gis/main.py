@@ -1,35 +1,19 @@
 import sys
 
-from flask import Flask, request
+from helpers import Env
 
-PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 9000
+from services import DbConnection
 
-app = Flask(__name__)
+PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 5001
+
+# Load the environment variables
+Env.load("env")
+
+# Start the database connection
+DbConnection()
+
+from routes import app
+
+# Start the server
 app.config["DEBUG"] = True
-
-
-@app.route('/api/markers', methods=['GET'])
-def get_markers():
-    args = request.args
-
-    return [
-        {
-            "type": "feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [41.69462, -8.84679]
-            },
-            "properties": {
-                "id": "7674fe6a-6c8d-47b3-9a1f-18637771e23b",
-                "name": "Ronaldo",
-                "country": "Portugal",
-                "position": "Striker",
-                "imgUrl": "https://cdn-icons-png.flaticon.com/512/805/805401.png",
-                "number": 7
-            }
-        }
-    ]
-
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=PORT)
+app.run(host=Env.get_var("API_GIS_HOST"), port=Env.get_var("API_GIS_PORT"))
