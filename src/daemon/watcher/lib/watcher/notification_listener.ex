@@ -74,11 +74,12 @@ defmodule Watcher.NotificationListener do
       case entity do
         %XmlParser.Entities.Country{} ->
           # Loop through all regions and publish to postgis queue
-          Enum.each(entity.regions, fn region ->
+          regions = XmlParser.Entities.Country.get_regions_without_coordinates(entity)
+
+          Enum.each(regions, fn region ->
             Watcher.Services.RabbitMQ.publish_message(rabbitMq_channel, "update-gis", %{
-              name: region.name,
-              lat: region.lat,
-              lng: region.lon
+              country: entity.name,
+              region: region.name
             })
           end)
 
