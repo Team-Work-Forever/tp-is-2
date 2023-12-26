@@ -8,6 +8,7 @@ import { mapTasterToDto } from 'src/mappers/taster.mapper';
 import { ReviewService } from './review.service';
 import { ConflitError } from 'errors/confilt.error';
 import { UpdateTasterRequest } from 'src/contracts/taster.requests';
+import { BadRequestError } from 'errors/bad-request.error';
 
 type UpdateTaster = UpdateTasterRequest & {
     tasterId: string
@@ -107,13 +108,40 @@ export class TasterService {
         return mapTasterToDto(updatedTaster);
     }
 
-    async findReviewsByTasterId(tasterId: string) {
+    async findReviewsByTasterId({
+        tasterId,
+        gt_points,
+        lt_points,
+        eq_points,
+        order = 'asc',
+        page = 1,
+        pageSize = 10,
+    }: {
+        tasterId: string,
+        gt_points?: string,
+        lt_points?: string,
+        eq_points?: string,
+        order?: string,
+        page?: number,
+        pageSize?: number,
+    }) {
         await this.findByTasterId(tasterId);
+
+        if (order !== 'asc' && order !== 'desc') {
+            throw new BadRequestError(`Order must be either asc or desc`);
+        }
 
         const reviews = await this.prisma.review.findMany({
             where: {
                 taster_id: tasterId,
+                points: {
+                    gt: gt_points && parseInt(gt_points),
+                    lt: lt_points && parseInt(lt_points),
+                    equals: eq_points && parseInt(eq_points),
+                },
             },
+            skip: (page - 1) * pageSize || 0,
+            take: pageSize || 10,
             include: {
                 taster: true,
                 wine: true,

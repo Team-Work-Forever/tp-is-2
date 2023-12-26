@@ -62,14 +62,6 @@ export class WineController {
             .status(200).send(wine);
     }
 
-    @Get(':wineId/reviews')
-    public async getReviewsByWineId(@Param('wineId', new UuidPipe()) { id: wineId }, @Res() response: Response): Promise<Response<ReviewDto[]>> {
-        const reviews = await this.wineService.findReviewsByWineId(wineId);
-
-        return response
-            .status(200).send(reviews);
-    }
-
     @Get(':wineId/reviews/:reviewId')
     public async getReviewIdByWineId(
         @Param('wineId', new UuidPipe()) { id: wineId },

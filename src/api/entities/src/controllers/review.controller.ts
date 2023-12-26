@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateReviewRequest, UpdateReviewRequest, reviewSchema, updateReviewSchema } from 'src/contracts/review.requests';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
@@ -39,8 +39,25 @@ export class ReviewController {
     }
 
     @Get()
-    public async findAll(@Res() response: Response) {
-        const reviews = await this.reviewService.findAll();
+    public async findAll(
+        @Query("page") page: string,
+        @Query("pageSize") pageSize: string,
+        @Query("gt_points") gt_points: string,
+        @Query("lt_points") lt_points: string,
+        @Query("eq_points") eq_points: string,
+        @Query("order") order: string,
+        @Param('wineId', new UuidPipe()) { id: wineId },
+        @Res() response: Response
+    ) {
+        const reviews = await this.reviewService.findAll({
+            wineId: wineId,
+            order: order, 
+            gt_points: gt_points,
+            lt_points: lt_points,
+            eq_points: eq_points,
+            page: parseInt(page),
+            pageSize: parseInt(pageSize),
+        });
 
         return response.status(HttpStatus.OK).json(reviews);
     }

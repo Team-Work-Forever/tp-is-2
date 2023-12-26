@@ -66,8 +66,25 @@ export class TasterController {
     }
 
     @Get(':tasterId/reviews')
-    public async getReviewsByTasterId(@Param('tasterId', new UuidPipe()) { id: tasterId }, @Res() response: Response): Promise<Response<ReviewDto[]>> {
-        const reviews = await this.tasterService.findReviewsByTasterId(tasterId);
+    public async getReviewsByTasterId(
+        @Query("page") page: string,
+        @Query("pageSize") pageSize: string,
+        @Query("gt_points") gt_points: string,
+        @Query("lt_points") lt_points: string,
+        @Query("eq_points") eq_points: string,
+        @Query("order") order: string,
+        @Param('tasterId', new UuidPipe()) { id: tasterId }, 
+        @Res() response: Response
+    ): Promise<Response<ReviewDto[]>> {
+        const reviews = await this.tasterService.findReviewsByTasterId({
+            tasterId,
+            order: order, 
+            gt_points: gt_points,
+            lt_points: lt_points,
+            eq_points: eq_points,
+            page: parseInt(page),
+            pageSize: parseInt(pageSize),
+        });
 
         return response
             .status(200).send(reviews);
