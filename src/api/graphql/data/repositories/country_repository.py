@@ -72,6 +72,21 @@ class CountryRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(cursor.fetchone(), 'country')
     
+    def deleteRegionById(self, regionId: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            DELETE 
+            FROM region
+            WHERE region.id = %s
+            RETURNING *
+            """, (regionId,)
+        )
+
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), 'region')
+       
+    
     def create_many_regions(self, regions, country_id):
         cursor = self._db_context.get_cursor()
 
@@ -118,6 +133,19 @@ class CountryRepository(BaseRepository):
             FROM region
             WHERE region.name = %s
             """, (name,)
+        )
+
+        return self._map_to_entity(cursor.fetchone(), mapper)
+    
+    def get_region_by_id(self, id: str, mapper = 'region'):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            SELECT
+                *
+            FROM region
+            WHERE region.id = %s
+            """, (id,)
         )
 
         return self._map_to_entity(cursor.fetchone(), mapper)

@@ -10,9 +10,6 @@ class DeleteCountry(Mutation):
     Output = CountryType
 
     def mutate(root, info, countryId: str = None):
-        if input is None:
-            return None
-        
         # Verify if the country exists
         country: CountryType = country_repo.get_by_id(countryId)
 

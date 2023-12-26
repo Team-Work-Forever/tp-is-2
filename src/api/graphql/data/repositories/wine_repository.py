@@ -6,6 +6,19 @@ class WineRepository(BaseRepository):
 
         self._MAP_ENTITIES = map_entities
 
+    def is_any_wine_using_region_by_id(self, region_id: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            SELECT
+                wine.id
+            FROM wine
+            WHERE wine.region_id = %s
+            """, (region_id,)
+        )
+
+        return cursor.fetchone() is not None
+
     def create(self, price, designation, variety, title, winery, region_id, region):
         cursor = self._db_context.get_cursor()
 
