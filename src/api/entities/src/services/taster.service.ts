@@ -153,7 +153,7 @@ export class TasterService {
 
     async findByReviewIdByTasterId(reviewId: string, tasterId: string) {
         await this.findByTasterId(tasterId);
-        await this.reviewService.findByReviewId(reviewId);
+        await this.reviewService.findById({ reviewId, tasterId });
 
         try {
             const review = await this.prisma.review.findFirstOrThrow({

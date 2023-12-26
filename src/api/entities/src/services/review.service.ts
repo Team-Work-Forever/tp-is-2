@@ -7,6 +7,13 @@ import { UpdateReviewRequest } from 'src/contracts/review.requests';
 import { mapReviewToDto } from 'src/mappers/review.mapper';
 
 type UpdateReview = UpdateReviewRequest & {
+    wineId: string
+    reviewId: string
+}
+
+type ReviewRelation = {
+    tasterId?: string
+    wineId?: string
     reviewId: string
 }
 
@@ -16,7 +23,7 @@ export class ReviewService {
         private readonly prisma: PrismaService,
     ) { }
 
-    async createReview(points: number, description: string, twitterHandle: string, wineId: string): Promise<ReviewDto> {
+    async create(points: number, description: string, twitterHandle: string, wineId: string): Promise<ReviewDto> {
         // Verfiy that the taster exists
         const taster = await this.prisma.taster.findFirst({
             where: {
@@ -64,11 +71,12 @@ export class ReviewService {
     }
 
     async update(request: UpdateReview) {
-        await this.findByReviewId(request.reviewId);
+        await this.findById(request);
 
         const updatedReview = await this.prisma.review.update({
             where: {
                 id: request.reviewId,
+                wine_id: request.wineId,
             },
             data: {
                 points: request.points,
@@ -83,7 +91,7 @@ export class ReviewService {
         return mapReviewToDto(updatedReview);
     }
 
-    async findAll({
+    async findAllByWineId({
         wineId,
         gt_points,
         lt_points,
@@ -127,10 +135,12 @@ export class ReviewService {
         return reviews.map(review => mapReviewToDto(review));
     }
 
-    async findByReviewId(reviewId: string): Promise<ReviewDto> {
+    async findById(request: ReviewRelation): Promise<ReviewDto> {
         const review = await this.prisma.review.findFirst({
             where: {
-                id: reviewId,
+                id: request.reviewId,
+                wine_id: request.wineId,
+                taster_id: request.tasterId,
             },
             include: {
                 taster: true,
@@ -139,18 +149,19 @@ export class ReviewService {
         });
 
         if (!review) {
-            throw new NotFoundError(`Review with id ${reviewId} not found`);
+            throw new NotFoundError(`Review with id ${request.reviewId} not found`);
         }
 
         return mapReviewToDto(review);
     }
 
-    async deleteReviewById(reviewId: string): Promise<ReviewDto> {
-        await this.findByReviewId(reviewId);
+    async deleleById(request: ReviewRelation): Promise<ReviewDto> {
+        await this.findById(request);
 
         const review = await this.prisma.review.delete({
             where: {
-                id: reviewId,
+                id: request.reviewId,
+                wine_id: request.wineId,
             },
             include: {
                 taster: true,
@@ -159,5 +170,16 @@ export class ReviewService {
         });
 
         return mapReviewToDto(review);
+    }
+
+    async findAll() {
+        const reviews = await this.prisma.review.findMany({
+            include: {
+                taster: true,
+                wine: true,
+            }
+        });
+
+        return reviews.map(review => mapReviewToDto(review));
     }
 }

@@ -1,17 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res, UsePipes } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateWineRequest, UpdateWineRequest, updateWineSchema, wineSchema } from 'src/contracts/wine.requests';
-import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { WineDto } from 'src/contracts/dtos/wine.dto';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { WineService } from 'src/services/wine.service';
-import { title } from 'process';
+import { CreateReviewRequest, UpdateReviewRequest, reviewSchema, updateReviewSchema } from 'src/contracts/review.requests';
+import { ReviewService } from 'src/services/review.service';
 
 @Controller('wines')
 export class WineController {
     constructor(
-        private readonly wineService: WineService
+        private readonly wineService: WineService,
+        private readonly reviewService: ReviewService
     ) { }
 
     @Post()
@@ -62,14 +63,77 @@ export class WineController {
             .status(200).send(wine);
     }
 
-    @Get(':wineId/reviews/:reviewId')
-    public async getReviewIdByWineId(
+    @Get(":wineId/reviews")
+    public async findAllReviews(
+        @Query("page") page: string,
+        @Query("pageSize") pageSize: string,
+        @Query("gt_points") gt_points: string,
+        @Query("lt_points") lt_points: string,
+        @Query("eq_points") eq_points: string,
+        @Query("order") order: string,
         @Param('wineId', new UuidPipe()) { id: wineId },
-        @Param('reviewId', new UuidPipe()) { id: reviewId },
-        @Res() response: Response): Promise<Response<ReviewDto>> {
-        const reviews = await this.wineService.findByReviewIdByWineId(reviewId, wineId);
+        @Res() response: Response
+    ) {
+        const reviews = await this.reviewService.findAllByWineId({
+            wineId: wineId,
+            order: order, 
+            gt_points: gt_points,
+            lt_points: lt_points,
+            eq_points: eq_points,
+            page: parseInt(page),
+            pageSize: parseInt(pageSize),
+        });
+
+        return response.status(HttpStatus.OK).json(reviews);
+    }
+
+    @Get(':wineId/reviews/:reviewId')
+    public async findByReviewId(
+        @Param("wineId", new UuidPipe()) { id: wineId }, 
+        @Param("reviewId", new UuidPipe()) { id: reviewId }, 
+        @Res() response: Response
+    ) {
+        const review = await this.reviewService.findById(reviewId);
+
+        return response.status(HttpStatus.OK).json(review);
+    }
+
+    @Delete(':wineId/reviews/:reviewId')
+    public async deleteByReviewId(
+        @Param("wineId", new UuidPipe()) { id: wineId },
+        @Param("reviewId", new UuidPipe()) { id: reviewId }, 
+        @Res() response: Response
+    ) {
+        const review = await this.reviewService.deleleById({wineId, reviewId});
+
+        return response.status(HttpStatus.OK).json(review);
+    }
+
+    @Post(":wineId/reviews")
+    public async create(
+        @Body(new ZodValidationPipe(reviewSchema)) request: CreateReviewRequest,
+        @Param("wineId", new UuidPipe()) { id: wineId },
+        @Res() response: Response) {
+        const review = await this.reviewService.create(
+            request.points,
+            request.description,
+            request.twitterHandle,
+            wineId,
+        );
+
+        return response.status(HttpStatus.CREATED).json(review);
+    }
+
+    @Put(":wineId/reviews/:reviewId")
+    public async update(
+        @Body(new ZodValidationPipe(updateReviewSchema)) request: UpdateReviewRequest,
+        @Param("wineId", new UuidPipe()) { id: wineId },
+        @Param("reviewId", new UuidPipe()) { id: reviewId },
+        @Res() response: Response
+    ) {
+        const review = await this.reviewService.update({ ...request, wineId, reviewId });
 
         return response
-            .status(200).send(reviews);
+            .status(HttpStatus.ACCEPTED).json(review);
     }
 }

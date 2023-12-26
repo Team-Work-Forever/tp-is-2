@@ -151,7 +151,7 @@ export class WineService {
 
     async findByReviewIdByWineId(reviewId: string, wineId: string): Promise<ReviewDto> {
         await this.findWineById(wineId);
-        await this.reviewService.findByReviewId(reviewId);
+        await this.reviewService.findById({ reviewId, wineId });
 
         const review = await this.prisma.review.findFirstOrThrow({
             where: {
