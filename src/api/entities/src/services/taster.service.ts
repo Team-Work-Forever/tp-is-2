@@ -104,7 +104,7 @@ export class TasterService {
             }
         })
 
-        return updatedTaster;
+        return mapTasterToDto(updatedTaster);
     }
 
     async findReviewsByTasterId(tasterId: string) {

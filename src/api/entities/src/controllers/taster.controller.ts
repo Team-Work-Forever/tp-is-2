@@ -29,10 +29,10 @@ export class TasterController {
         @Param("tasterId", new UuidPipe()) { id: tasterId },
         @Res() response: Response
     ) {
-        const result = this.tasterService.update({ ...request, tasterId });
-
+        const result = await this.tasterService.update({ ...request, tasterId });
+        
         return response
-            .status(HttpStatus.ACCEPTED).json(result);
+            .status(HttpStatus.ACCEPTED).send(result);
     }
 
     @Get()
@@ -44,7 +44,7 @@ export class TasterController {
             .findAll(name, twitterHandle);
 
         return response
-            .status(HttpStatus.ACCEPTED).send(tasters);
+            .status(HttpStatus.OK).send(tasters);
     }
 
     @Get(':tasterId')
