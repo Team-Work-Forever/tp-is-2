@@ -74,8 +74,6 @@ export class CountryService {
                 return await extendedPrismas.region.create({
                     name: region.name,
                     province: region.province,
-                    lat: region.lat,
-                    lon: region.lon,
                     country_id: country.id
                 })
             }));

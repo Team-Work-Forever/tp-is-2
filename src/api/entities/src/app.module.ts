@@ -1,15 +1,15 @@
-import { Module } from "@nestjs/common";
-import { CountryController } from "./controllers/country.controller";
-import { CountryService } from "./services/country.service";
-import { PrismaService } from "./config/prisma/prisma.service";
-import { TasterService } from "./services/taster.service";
-import { TasterController } from "./controllers/taster.controller";
-import { WineController } from "./controllers/wine.controller";
-import { WineService } from "./services/wine.service";
-import { ReviewController } from "./controllers/review.controller";
-import { ReviewService } from "./services/review.service";
-import { RegionController } from "./controllers/region.controller";
-import { RegionService } from "./services/region.service";
+import { Module } from '@nestjs/common';
+import { CountryController } from './controllers/country.controller';
+import { CountryService } from './services/country.service';
+import { PrismaService } from './config/prisma/prisma.service';
+import { TasterService } from './services/taster.service';
+import { TasterController } from './controllers/taster.controller';
+import { WineController } from './controllers/wine.controller';
+import { WineService } from './services/wine.service';
+import { ReviewController } from './controllers/review.controller';
+import { ReviewService } from './services/review.service';
+import { RegionController } from './controllers/region.controller';
+import { RegionService } from './services/region.service';
 
 @Module({
   controllers: [
@@ -17,7 +17,7 @@ import { RegionService } from "./services/region.service";
     TasterController,
     WineController,
     ReviewController,
-    RegionController
+    RegionController,
   ],
   providers: [
     TasterService,
@@ -25,7 +25,7 @@ import { RegionService } from "./services/region.service";
     CountryService,
     WineService,
     ReviewService,
-    RegionService
+    RegionService,
   ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -3,8 +3,6 @@ import { Prisma } from "@prisma/client";
 export type CreateRegionDao = {
     name: string;
     province: string;
-    lat: number;
-    lon: number;
     country_id: string;
 }
 
@@ -16,9 +14,9 @@ export type RegionDao = {
     id: string;
     name: string;
     province: string;
+    country: string;
     lat: number;
     lon: number;
-    country: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -31,68 +29,33 @@ export default Prisma.defineExtension((prisma) => {
                     id,
                     name,
                     province,
-                    lat,
-                    lon
-                }: UpdateRegionDao): Promise<RegionDao> {
+                }: UpdateRegionDao) {
                     const context = Prisma.getExtensionContext(prisma);
-                    const updateProperties = [];
 
-                    if (lat && lon) {
-                        const point = `POINT(${lat} ${lon})`;
-                        updateProperties.push(`coordinates = ST_GeomFromText($1, 4326)`);
-                    }
-
-                    if (name) {
-                        updateProperties.push(`name = 'Lisboa'`);
-                    }
-
-                    if (province) {
-                        updateProperties.push(`province = $3`);
-                    }
-
-                    console.log(`
-                        UPDATE region SET
-                            ${updateProperties.join(", ")}
-                        WHERE id = 'c7702222-3caa-4b9d-ae40-119adb58d825'
-                    `);
-
-
-                    const response = await context.$queryRaw`
-                        UPDATE region SET
-                            ${Prisma.join(updateProperties, ", ")}
-                        WHERE id = 'c7702222-3caa-4b9d-ae40-119adb58d825'
-                    `;
-
-                    const country = await context.country.findFirst({
+                    await context.region.update({
+                        data: {
+                            name: name,
+                            province: province,
+                        },
+                        include: 
+                            {
+                                country: true
+                            },
                         where: {
-                            id: response[0].country_id
+                            id: id
                         }
                     })
-
-                    return {
-                        id: response[0].id,
-                        name,
-                        province,
-                        lat,
-                        lon,
-                        country: country?.name,
-                        created_at: response[0].created_at,
-                        updated_at: response[0].updated_at,
-                    } as RegionDao;
                 },
                 async create({
                     name,
                     province,
-                    lat,
-                    lon,
                     country_id
                 }: CreateRegionDao): Promise<RegionDao> {
                     const context = Prisma.getExtensionContext(prisma);
-                    const point = `POINT(${lat} ${lon})`;
 
                     const response = await context.$queryRaw`
-                        INSERT INTO "region" (name, province, coordinates, country_id) VALUES (
-                            ${name}, ${province}, ST_GeomFromText(${point}, 4326), ${country_id}::uuid)
+                        INSERT INTO "region" (name, province, country_id) VALUES (
+                            ${name}, ${province}, ${country_id}::uuid)
                         returning id, created_at, updated_at;
                     `;
 
@@ -106,8 +69,6 @@ export default Prisma.defineExtension((prisma) => {
                         id: response[0].id,
                         name,
                         province,
-                        lat,
-                        lon,
                         country: country?.name,
                         created_at: response[0].created_at,
                         updated_at: response[0].updated_at,

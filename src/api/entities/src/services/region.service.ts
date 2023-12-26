@@ -6,6 +6,7 @@ import { CountryService } from './country.service';
 import { CreateRegionRequest, UpdateRegionRequest } from 'src/contracts/region.requests';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
 import { ConflitError } from 'errors/confilt.error';
+import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from '@prisma/client/runtime/library';
 
 type CreateRegion = {
     request: CreateRegionRequest;
@@ -34,14 +35,14 @@ export class RegionService {
                 const regionDAO = await extendedPrisma.region.create({
                     name: region.name,
                     province: region.province,
-                    lat: region.lat,
-                    lon: region.lon,
                     country_id: data.countryId
                 })
 
                 return mapRegionDaoToDto(regionDAO);
-            } catch (error) {
-                throw new ConflitError(`${region.name} already exists => ${error.message}`);
+            } catch  (error) {
+                if (error instanceof PrismaClientKnownRequestError) {
+                    throw new ConflitError(`This region already exists on an country.`);
+                }
             }
         }));
 
@@ -51,17 +52,16 @@ export class RegionService {
         await this.countryService.findCountryById(request.countryId);
         const extendedPrisma = this.prisma.$extends(createRegionExtension);
 
-        console.log(request);
-
-
-        const region = await extendedPrisma.region.update({
+        await extendedPrisma.region.update({
             id: request.regionId,
             name: request.name,
             province: request.province,
-            lat: request.lat,
-            lon: request.lon,
             country_id: request.countryId,
         });
+
+        const region = await extendedPrisma
+                            .region
+                            .fetchRegionById(request.regionId);
 
         return mapRegionDaoToDto(region);
     }
@@ -109,15 +109,22 @@ export class RegionService {
             throw new ConflitError("It's not possible to remove a Region with Wines associated to it. Please remove the Wines first and try again.");
         }
 
-        const region = await this.prisma.region.delete({
-            where: {
-                id: regionId,
-                country: {
-                    id: countryId,
+        try {
+            const region = await this.prisma.region.delete({
+                where: {
+                    id: regionId,
+                    country: {
+                        id: countryId,
+                    }
                 }
-            }
-        });
+            });
 
-        return mapRegionToDto(region);
+            return mapRegionToDto(region);
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                throw new NotFoundError("Region not found");
+            }
+        }
+
     }
 }
