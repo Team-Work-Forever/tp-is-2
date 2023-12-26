@@ -79,6 +79,17 @@ export class WineService {
     }
 
     async create({ price, designation, variety, winery, title, region }: CreateWine) {
+        // verify if region exists
+        const regionFound = await this.prisma.region.findFirst({
+            where: {
+                name: region,
+            }
+        });
+
+        if (!regionFound) {
+            throw new NotFoundError("Region not found");
+        }
+
         try {
             const wine = await this.prisma.wine.create({
                 data: {
@@ -108,6 +119,17 @@ export class WineService {
 
     async update(request: UpdateWine) {
         await this.findWineById(request.wineId);
+
+        const regionFound = await this.prisma.region.findFirst({
+            where: {
+                name: request.region,
+            }
+        });
+
+        if (!regionFound) {
+            throw new NotFoundError("Region not found");
+        }
+
 
         const wine = await this.prisma.wine.update({
             where: {
