@@ -17,6 +17,3 @@ class Query(ObjectType):
     
     def resolve_hello(self, info):
         return 'World'
-    
-
-schema = Schema(query=Query, types=[CountryType])

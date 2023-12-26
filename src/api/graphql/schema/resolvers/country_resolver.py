@@ -15,3 +15,6 @@ country_repository = CountryRepository({
 
 def resolve_countries(query, info):
     return country_repository.get_all()
+
+def mutate_country(root, info, country_data = None):
+    return country_repository.create(input)

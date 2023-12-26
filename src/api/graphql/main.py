@@ -13,10 +13,10 @@ PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 7322
 
 app = Flask(__name__)
 
-from schema import query_schema
+from schema import schema
 app.add_url_rule(
     "/graphql",
-    view_func=GraphQLView.as_view("graphql", schema=query_schema, graphiql=True),
+    view_func=GraphQLView.as_view("graphql", schema=schema, graphiql=True),
 )
 
 app.config["DEBUG"] = True

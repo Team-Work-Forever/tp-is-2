@@ -6,6 +6,74 @@ class WineRepository(BaseRepository):
 
         self._MAP_ENTITIES = map_entities
 
+    def create(self, price, designation, variety, title, winery, region_id, region):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            INSERT INTO wine (
+                price,
+                designation,
+                variety,
+                title,
+                winery,
+                region_id
+            ) VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING
+                id,
+                price,
+                designation,
+                variety,
+                winery,
+                title,
+                created_at,
+                updated_at,
+                deleted_at
+        """, (price, designation, variety, title, winery, region_id))
+
+        wine = cursor.fetchone()
+        wine = wine + (region,)
+
+        self._db_context.commit()
+        return self._map_to_entity(wine, 'wine')
+    
+    def create_review(self, wine_id, points, description, taster_id):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            INSERT INTO review (
+                points,
+                description,
+                wine_id,
+                taster_id
+            ) VALUES (%s, %s, %s, %s)
+            RETURNING
+                id,
+                description,
+                points,
+                created_at,
+                updated_at,
+                deleted_at
+        """, (points, description, wine_id, taster_id))
+
+        review = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT
+                t.twitter_handle,
+                w.title
+            FROM review r
+            INNER JOIN taster t ON r.taster_id = t.id
+            INNER JOIN wine w ON r.wine_id = w.id
+            WHERE r.id = %s
+        """, (review[0],))
+
+        result = cursor.fetchone()
+        review = review + result
+        print(review)
+
+        self._db_context.commit()
+        return self._map_to_entity(review, 'review')
+
     def get_review_by_wine_id(self, wine_id):
         cursor = self._db_context.get_cursor()
 
@@ -15,10 +83,10 @@ class WineRepository(BaseRepository):
                 review.description,
                 review.points,
                 taster.twitter_handle,
-                wine.title,
                 review.created_at,
                 review.updated_at,
                 review.deleted_at,
+                wine.title,
                 taster.name
             FROM review
             INNER JOIN taster ON review.taster_id = taster.id
