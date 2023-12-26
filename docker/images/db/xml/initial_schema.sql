@@ -20,7 +20,7 @@ CREATE TABLE public.converted_documents (
 create or replace function public.notify_insert_tr()
     returns trigger as $$
 begin
-    perform pg_notify('watch_channel', new.xml::text);
+    perform pg_notify('watch_channel', new.id::text);
     return new;
 end;
 $$ language plpgsql;

@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS POSTGIS;
 CREATE EXTENSION IF NOT EXISTS POSTGIS_TOPOLOGY;
 
 CREATE TABLE public.country (
-    id uuid DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v5(uuid_ns_url(), 'country'),
     name varchar(25) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now(),
@@ -12,10 +12,10 @@ CREATE TABLE public.country (
 );
 
 CREATE TABLE public.region (
-    id uuid DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v5(uuid_ns_url(), 'region'),
     name varchar(25) NOT NULL UNIQUE,
     province varchar(50) NOT NULL,
-    coordinates GEOMETRY(Point, 4326),
+    coordinates GEOMETRY(Point, 4326) DEFAULT NULL,
     country_id uuid NOT NULL,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now(),
@@ -27,7 +27,7 @@ CREATE TABLE public.region (
 );
 
 CREATE TABLE public.taster (
-    id uuid DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v5(uuid_ns_url(), 'taster'),
     name varchar(25) NOT NULL UNIQUE,
     twitter_handle varchar(50) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT now(),
@@ -37,7 +37,7 @@ CREATE TABLE public.taster (
 );
 
 CREATE TABLE public.wine (
-    id uuid DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v5(uuid_ns_url(), 'wine'),
     price float NOT NULL,
     designation text NOT NULL,
     variety varchar(50) NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE public.wine (
 );
 
 CREATE TABLE public.review (
-    id uuid DEFAULT uuid_generate_v4(),
+    id uuid DEFAULT uuid_generate_v5(uuid_ns_url(), 'review'),
     points int NOT NULL,
     description text NOT NULL,
     taster_id uuid NOT NULL,
