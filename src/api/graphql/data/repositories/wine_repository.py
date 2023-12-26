@@ -31,6 +31,50 @@ class WineRepository(BaseRepository):
         """, (twitter_handle,))
 
         return cursor.fetchone() is not None
+    
+    def wine_has_any_reviews_associated(self, wineId: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            SELECT
+                review.id
+            FROM review
+            INNER JOIN wine ON review.wine_id = wine.id
+            WHERE wine.id = %s
+        """, (wineId,))
+
+        return cursor.fetchone() is not None
+    
+    def delete(self, wine_id: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            DELETE FROM wine
+            WHERE wine.id = %s
+            RETURNING
+                id,
+                price,
+                designation,
+                variety,
+                winery,
+                title,
+                region_id,
+                created_at,
+                updated_at,
+                deleted_at
+        """, (wine_id,))
+
+        wine = cursor.fetchone()
+        cursor.execute("""
+            SELECT
+                name
+            FROM region
+            WHERE id = %s
+        """, (wine[6],))
+
+        wine += (cursor.fetchone()[0],)
+        self._db_context.commit()
+        return self._map_to_entity(wine, 'wine')
 
     def create(self, price, designation, variety, title, winery, region_id, region):
         cursor = self._db_context.get_cursor()
@@ -121,6 +165,28 @@ class WineRepository(BaseRepository):
         """, (wine_id,))
 
         return self._map_to_entity_collection(cursor.fetchall(), 'review')
+    
+    def get_by_id(self, wine_id):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            SELECT
+                wine.id,
+                wine.price,
+                wine.designation,
+                wine.variety,
+                wine.winery,
+                wine.title,
+                wine.created_at,
+                wine.updated_at,
+                wine.deleted_at,
+                region.name
+            FROM wine
+            INNER JOIN region ON wine.region_id = region.id
+            WHERE wine.id = %s
+        """, (wine_id,))
+
+        return self._map_to_entity(cursor.fetchone(), 'wine')
 
     def get_all(self):
         cursor = self._db_context.get_cursor()
