@@ -166,6 +166,41 @@ class WineRepository(BaseRepository):
 
         return self._map_to_entity_collection(cursor.fetchall(), 'review')
     
+    def delete_review(self, review_id):
+        cursor = self._db_context.get_cursor()
+
+        review = self.get_review_by_id(review_id)
+
+        cursor.execute("""
+            DELETE FROM review
+            WHERE review.id = %s
+        """, (review_id,))
+
+        self._db_context.commit()
+        return review
+    
+    def get_review_by_id(self, review_id):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            SELECT
+                review.id,
+                review.description,
+                review.points,
+                taster.twitter_handle,
+                review.created_at,
+                review.updated_at,
+                review.deleted_at,
+                wine.title,
+                taster.name
+            FROM review
+            INNER JOIN taster ON review.taster_id = taster.id
+            INNER JOIN wine On review.wine_id = wine.id
+            WHERE review.id = %s
+        """, (review_id,))
+
+        return self._map_to_entity(cursor.fetchone(), 'review')
+    
     def get_by_id(self, wine_id):
         cursor = self._db_context.get_cursor()
 
