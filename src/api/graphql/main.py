@@ -4,7 +4,7 @@ from helpers import Env
 
 from flask import Flask
 from flask_graphql import GraphQLView
-from data.db_access import DbConnection
+from data import DbConnection
 
 Env.load()
 DbConnection()

@@ -1,6 +1,4 @@
 from data.repositories.base_repository import BaseRepository
-from schema.types.taster import TasterType
-
 
 class TasterRepository(BaseRepository):
     def __init__(self, mappers):
