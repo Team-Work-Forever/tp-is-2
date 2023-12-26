@@ -1,6 +1,6 @@
 from graphene import Mutation
 
-from schema.mutations.inputs.create_wine_input import CreateWineInput
+from schema.mutations.wine.inputs.create_wine_input import CreateWineInput
 from schema.types.region_type import RegionType
 from schema.types.wine_type import WineType
 

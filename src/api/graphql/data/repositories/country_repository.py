@@ -6,6 +6,32 @@ class CountryRepository(BaseRepository):
 
         self._MAP_ENTITIES = map_entities
 
+    def check_if_country_has_regions(self, country_id: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            SELECT
+                region.id
+            FROM region
+            WHERE region.country_id = %s
+            """, (country_id,)
+        )
+
+        return cursor.fetchone() is not None
+
+    def get_by_id(self, country_id: str, mapper = 'country'):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            SELECT
+               *
+            FROM country
+            WHERE country.id = %s
+            """, (country_id,)
+        )
+
+        return self._map_to_entity(cursor.fetchone(), mapper)
+
     def create(self, name):
         cursor = self._db_context.get_cursor()
 
@@ -14,6 +40,33 @@ class CountryRepository(BaseRepository):
             VALUES (%s)
             RETURNING *
             """, (name,)
+        )
+
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), 'country')
+    
+    def create(self, name):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            INSERT INTO country (name)
+            VALUES (%s)
+            RETURNING *
+            """, (name,)
+        )
+
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), 'country')
+    
+    def delete(self, country_id: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            DELETE 
+            FROM country
+            WHERE country.id = %s
+            RETURNING *
+            """, (country_id,)
         )
 
         self._db_context.commit()

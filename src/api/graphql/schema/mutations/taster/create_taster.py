@@ -1,5 +1,5 @@
 from graphene import Mutation
-from schema.mutations.inputs.create_taster_input import CreateTasterInput
+from schema.mutations.taster.inputs.create_taster_input import CreateTasterInput
 from schema.types.taster_type import TasterType
 from schema import taster_repo
 

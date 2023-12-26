@@ -1,6 +1,6 @@
 from graphene import Mutation
 
-from schema.mutations.inputs.create_country_input import CreateCountryInput
+from schema.mutations.country.inputs.create_country_input import CreateCountryInput
 from schema.types.country_type import CountryType
 from schema import country_repo
 

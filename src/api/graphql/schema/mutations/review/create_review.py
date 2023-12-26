@@ -1,5 +1,5 @@
 from graphene import Mutation, String
-from schema.mutations.inputs.create_review_input import CreateReviewInput
+from schema.mutations.review.inputs.create_review_input import CreateReviewInput
 from schema.types.review_type import ReviewType
 from schema import taster_repo, wine_repo
 
