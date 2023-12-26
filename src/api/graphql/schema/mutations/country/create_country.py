@@ -14,7 +14,14 @@ class CreateCountry(Mutation):
         if input is None:
             return None
         
-        country = country_repo.create(input.name)
+        if input.name is not None:
+            country = country_repo.create(input.name)
+        else:
+            country = country_repo.get_by_id(input.id)
+
+        # Country does not exist
+        if country is None:
+            return None
 
         if input.regions is not None:
             country['regions'] = country_repo.create_many_regions(input.regions, country['id'])

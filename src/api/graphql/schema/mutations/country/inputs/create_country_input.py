@@ -4,5 +4,6 @@ from schema.mutations.country.inputs.create_region_input import CreateRegionInpu
 
 
 class CreateCountryInput(InputObjectType):
-    name = String(required=True)
+    id = String(required=False)
+    name = String(required=False)
     regions = List(CreateRegionInput, required=False)
