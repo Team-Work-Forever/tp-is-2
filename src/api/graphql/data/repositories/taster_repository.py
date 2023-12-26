@@ -17,6 +17,30 @@ class TasterRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(cursor.fetchone(), "taster")
     
+    def get_by_id(self, taster_id: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            SELECT 
+                * 
+            FROM taster WHERE id = %s
+        """, (taster_id,))
+        
+        return self._map_to_entity(cursor.fetchone(), "taster")
+    
+    def delete(self, taster_id: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            DELETE 
+            FROM taster 
+            WHERE id = %s
+            RETURNING *;
+        """, (taster_id,))
+        
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), "taster")
+    
     def get_by_twitter_handle(self, twitter_handle: str):
         cursor = self._db_context.get_cursor()
 

@@ -18,6 +18,19 @@ class WineRepository(BaseRepository):
         )
 
         return cursor.fetchone() is not None
+    
+    def is_any_review_using_taster_twitter_handle(self, twitter_handle: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            SELECT
+                review.id
+            FROM review
+            INNER JOIN taster ON review.taster_id = taster.id
+            WHERE taster.twitter_handle = %s
+        """, (twitter_handle,))
+
+        return cursor.fetchone() is not None
 
     def create(self, price, designation, variety, title, winery, region_id, region):
         cursor = self._db_context.get_cursor()

@@ -1,4 +1,7 @@
 def map_to_region(row):
+    if row is None:
+        return None
+
     return {
         'id': row[0],
         'name': row[1],
@@ -9,6 +12,9 @@ def map_to_region(row):
     }
 
 def map_to_country(row):
+    if row is None:
+        return None
+
     return {
         'id': row[0],
         'name': row[1],
@@ -19,6 +25,9 @@ def map_to_country(row):
 
 
 def map_to_taster(row):
+    if row is None:
+        return None
+
     return {
         'id': row[0],
         'name': row[1],
@@ -29,6 +38,9 @@ def map_to_taster(row):
     }
 
 def map_to_review(row):
+    if row is None:
+        return None
+
     return {
         'id': row[0],
         'description': row[1],
@@ -42,6 +54,9 @@ def map_to_review(row):
 
 
 def map_to_wine(row):
+    if row is None:
+        return None
+
     return {
         'id': row[0],
         'price': row[1],
