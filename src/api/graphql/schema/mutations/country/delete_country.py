@@ -15,11 +15,11 @@ class DeleteCountry(Mutation):
 
         # Can't delete a country that doesn't exist
         if country is None:
-            return None
+            raise Exception('Country not found')
 
         # Verify if the country has regions
         if country_repo.check_if_country_has_regions(countryId):
-            return None
+            raise Exception('Country has regions. Please delete them first')
         
         country = country_repo.delete(countryId)
         return country

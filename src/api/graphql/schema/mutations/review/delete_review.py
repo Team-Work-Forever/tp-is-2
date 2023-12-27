@@ -11,7 +11,7 @@ class DeleteReview(Mutation):
 
     def mutate(root, info, reviewId: str = None):
         if not reviewId:
-            return None
+            raise Exception('Please provide a reviewId')
         
         # Get Review
         review = wine_repo.get_review_by_id(reviewId)

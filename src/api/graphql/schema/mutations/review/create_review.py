@@ -12,11 +12,11 @@ class CreateReview(Mutation):
 
     def mutate(root, info, wineId: str, input: CreateReviewInput = None):
         if input is None:
-            return None
+            raise Exception('Please provide an input')
         
         taster = taster_repo.get_by_twitter_handle(input.twitterHandle)
 
         if taster is None:
-            return None
+            raise Exception('Taster not found')
         
         return wine_repo.create_review(wineId, input.points, input.description, taster['id'])

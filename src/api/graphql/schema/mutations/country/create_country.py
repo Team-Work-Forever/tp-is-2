@@ -12,7 +12,7 @@ class CreateCountry(Mutation):
 
     def mutate(root, info, input: CreateCountryInput = None):
         if input is None:
-            return None
+            raise Exception('Please provide an input')
         
         if input.name is not None:
             country = country_repo.create(input.name)
@@ -21,7 +21,7 @@ class CreateCountry(Mutation):
 
         # Country does not exist
         if country is None:
-            return None
+            raise Exception('Country not found')
 
         if input.regions is not None:
             country['regions'] = country_repo.create_many_regions(input.regions, country['id'])

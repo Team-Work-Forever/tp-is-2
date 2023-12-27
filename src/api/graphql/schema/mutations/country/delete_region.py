@@ -14,11 +14,11 @@ class DeleteRegion(Mutation):
 
         # Can't delete a country that doesn't exist
         if region is None:
-            return None
+            raise Exception('Region not found')
 
         # Is region being used on a wine?
         if wine_repo.is_any_wine_using_region_by_id(regionId):
-            return None
+            raise Exception('Region is being used on a wine. Please delete them first')
 
         country = country_repo.deleteRegionById(regionId)
         return country

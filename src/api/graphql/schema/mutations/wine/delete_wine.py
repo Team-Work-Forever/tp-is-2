@@ -11,7 +11,7 @@ class DeleteWine(Mutation):
 
     def mutate(root, info, wineId: str = None):
         if wineId is None:
-            return None
+            raise Exception("Please provide a wineId")
         
         # try to get the wine
         wine = wine_repo.get_by_id(wineId)
