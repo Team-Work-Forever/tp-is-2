@@ -72,6 +72,32 @@ class CountryRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(cursor.fetchone(), 'country')
     
+    def update_region(self, region_id: str, name: str = None, province: str = None):
+        cursor = self._db_context.get_cursor()
+        params = []
+        expr = []
+
+        if name is not None:
+            params.append(name)
+            expr.append('name = %s')
+
+        if province is not None:
+            params.append(province)
+            expr.append('province = %s')
+
+        update_query = f"""
+            UPDATE region
+            SET {', '.join(expr)}
+            WHERE region.id = %s
+            RETURNING *
+        """
+
+        params.append(region_id)
+        cursor.execute(update_query, tuple(params))
+
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), 'region')
+    
     def delete(self, country_id: str):
         cursor = self._db_context.get_cursor()
 

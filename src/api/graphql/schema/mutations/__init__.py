@@ -5,6 +5,7 @@ from schema.mutations.country.create_country import CreateCountry
 from schema.mutations.country.delete_country import DeleteCountry
 from schema.mutations.country.delete_region import DeleteRegion
 from schema.mutations.country.update_country import UpdateCountry
+from schema.mutations.country.update_region import UpdateRegion
 from schema.mutations.review.create_review import CreateReview
 from schema.mutations.review.delete_review import DeleteReview
 from schema.mutations.taster.create_taster import CreateTaster
@@ -18,6 +19,7 @@ class Mutation(ObjectType):
     delete_country = DeleteCountry.Field()
     update_country = UpdateCountry.Field()
     delete_region = DeleteRegion.Field()
+    update_region = UpdateRegion.Field()
 
     create_taster = CreateTaster.Field()
     delete_taster = DeleteTaster.Field()
