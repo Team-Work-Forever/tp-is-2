@@ -58,6 +58,20 @@ class CountryRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(cursor.fetchone(), 'country')
     
+    def update(self, country_id: str, name: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            UPDATE country
+            SET name = %s
+            WHERE country.id = %s
+            RETURNING *
+            """, (name, country_id)
+        )
+
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), 'country')
+    
     def delete(self, country_id: str):
         cursor = self._db_context.get_cursor()
 
