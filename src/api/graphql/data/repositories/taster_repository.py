@@ -17,6 +17,19 @@ class TasterRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(cursor.fetchone(), "taster")
     
+    def update(self, taster_id: str, name: str):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute("""
+            UPDATE taster 
+            SET name = %s
+            WHERE id = %s
+            RETURNING *;
+        """, (name, taster_id))
+        
+        self._db_context.commit()
+        return self._map_to_entity(cursor.fetchone(), "taster")
+    
     def get_by_id(self, taster_id: str):
         cursor = self._db_context.get_cursor()
 
