@@ -45,11 +45,11 @@ def map_to_review(row):
         'id': row[0],
         'description': row[1],
         'points': row[2],
-        'twitter_handle': row[3],
-        'wine_title': row[4],
-        'createdAt': row[5],
-        'updatedAt': row[6],
-        'deletedAt': row[7]
+        'twitter_handle': row[6],
+        'wine_title': row[7],
+        'createdAt': row[3],
+        'updatedAt': row[4],
+        'deletedAt': row[5]
     }
 
 

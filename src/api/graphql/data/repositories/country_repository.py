@@ -45,19 +45,6 @@ class CountryRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(cursor.fetchone(), 'country')
     
-    def create(self, name):
-        cursor = self._db_context.get_cursor()
-
-        cursor.execute(""" 
-            INSERT INTO country (name)
-            VALUES (%s)
-            RETURNING *
-            """, (name,)
-        )
-
-        self._db_context.commit()
-        return self._map_to_entity(cursor.fetchone(), 'country')
-    
     def update(self, country_id: str, name: str):
         cursor = self._db_context.get_cursor()
 

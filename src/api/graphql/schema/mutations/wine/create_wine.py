@@ -14,12 +14,12 @@ class CreateWine(Mutation):
 
     def mutate(root, info, input: CreateWineInput = None):
         if input is None:
-            return None
+            raise Exception('Input is required')
         
         region: RegionType = country_repo.get_region_by_name(input.region)
 
         if region is None:
-            return None
+            raise Exception('Region not found')
         
         return wine_repo.create(
             input.price,

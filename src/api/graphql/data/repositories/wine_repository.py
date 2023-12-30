@@ -106,6 +106,64 @@ class WineRepository(BaseRepository):
         self._db_context.commit()
         return self._map_to_entity(wine, 'wine')
     
+    def update(self, wine_id, price, designation, variety, title, winery):
+        cursor = self._db_context.get_cursor()
+
+        params = []
+        expr = []
+
+        if price is not None:
+            params.append(price)
+            expr.append('price = %s')
+
+        if designation is not None:
+            params.append(designation)
+            expr.append('designation = %s')
+
+        if variety is not None:
+            params.append(variety)
+            expr.append('variety = %s')
+
+        if title is not None:
+            params.append(title)
+            expr.append('title = %s')
+
+        if winery is not None:
+            params.append(winery)
+            expr.append('winery = %s')
+
+        update_query = f"""
+            UPDATE wine
+            SET {', '.join(expr)}
+            WHERE id = %s
+            RETURNING 
+                id,
+                price,
+                designation,
+                variety,
+                winery,
+                title,
+                region_id,
+                created_at,
+                updated_at,
+                deleted_at
+        """
+
+        params.append(wine_id)
+        cursor.execute(update_query, tuple(params))
+        wine = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT
+                name
+            FROM region
+            WHERE id = %s
+        """, (wine[6],))
+
+        wine += (cursor.fetchone()[0],)
+        self._db_context.commit()
+        return self._map_to_entity(wine, 'wine')
+    
     def create_review(self, wine_id, points, description, taster_id):
         cursor = self._db_context.get_cursor()
 
@@ -123,9 +181,10 @@ class WineRepository(BaseRepository):
                 created_at,
                 updated_at,
                 deleted_at
-        """, (points, description, wine_id, taster_id))
+        """, (points, description, wine_id, taster_id,))
 
         review = cursor.fetchone()
+        print(review)
 
         cursor.execute("""
             SELECT
@@ -138,9 +197,9 @@ class WineRepository(BaseRepository):
         """, (review[0],))
 
         result = cursor.fetchone()
-        review = review + result
         print(review)
-
+        review = review + result
+        # print(review)
         self._db_context.commit()
         return self._map_to_entity(review, 'review')
 
@@ -152,12 +211,11 @@ class WineRepository(BaseRepository):
                 review.id,
                 review.description,
                 review.points,
-                taster.twitter_handle,
                 review.created_at,
                 review.updated_at,
                 review.deleted_at,
-                wine.title,
-                taster.name
+                taster.twitter_handle,
+                wine.title
             FROM review
             INNER JOIN taster ON review.taster_id = taster.id
             INNER JOIN wine On review.wine_id = wine.id
@@ -178,6 +236,52 @@ class WineRepository(BaseRepository):
 
         self._db_context.commit()
         return review
+    
+    def update_review(self, review_id, points, description):
+        cursor = self._db_context.get_cursor()
+        params = []
+        expr = []
+
+        if points is not None:
+            params.append(points)
+            expr.append('points = %s')
+
+        if description is not None:
+            params.append(description)
+            expr.append('description = %s')
+
+        update_query = f"""
+            UPDATE review
+            SET {', '.join(expr)}
+            WHERE id = %s
+            RETURNING 
+                id,
+                description,
+                points,
+                created_at,
+                updated_at,
+                deleted_at
+        """
+
+        params.append(review_id)
+        cursor.execute(update_query, tuple(params))
+        review = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT
+                t.twitter_handle,
+                w.title
+            FROM review r
+            INNER JOIN taster t ON r.taster_id = t.id
+            INNER JOIN wine w ON r.wine_id = w.id
+            WHERE r.id = %s
+        """, (review[0],))
+
+        result = cursor.fetchone()
+        review = review + result
+
+        self._db_context.commit()
+        return self._map_to_entity(review, 'review')
     
     def get_review_by_id(self, review_id):
         cursor = self._db_context.get_cursor()

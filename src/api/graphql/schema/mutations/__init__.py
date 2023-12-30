@@ -8,17 +8,20 @@ from schema.mutations.country.update_country import UpdateCountry
 from schema.mutations.country.update_region import UpdateRegion
 from schema.mutations.review.create_review import CreateReview
 from schema.mutations.review.delete_review import DeleteReview
+from schema.mutations.review.update_review import UpdateReview
 from schema.mutations.taster.create_taster import CreateTaster
 from schema.mutations.taster.delete_taster import DeleteTaster
 from schema.mutations.taster.update_taster import UpdateTaster
 from schema.mutations.wine.create_wine import CreateWine
 from schema.mutations.wine.delete_wine import DeleteWine
+from schema.mutations.wine.update_wine import UpdateWine
 
 
 class Mutation(ObjectType):
     create_country = CreateCountry.Field()
     delete_country = DeleteCountry.Field()
     update_country = UpdateCountry.Field()
+    
     delete_region = DeleteRegion.Field()
     update_region = UpdateRegion.Field()
 
@@ -28,9 +31,11 @@ class Mutation(ObjectType):
 
     create_wine = CreateWine.Field()
     delete_wine = DeleteWine.Field()
+    update_wine = UpdateWine.Field()
     
     create_review = CreateReview.Field()
     delete_review = DeleteReview.Field()
+    update_review = UpdateReview.Field()
 
 __all__ = [
     'Mutation'
