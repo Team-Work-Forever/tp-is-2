@@ -1,6 +1,9 @@
-from graphene import InputObjectType, String
+from graphene import InputObjectType
+from schema.mutations.inputs.text_input import Text
+
+from schema.mutations.inputs.uuid_input import UUID
 
 
 class UpdateTasterInput(InputObjectType):
-    id = String(required=True)
-    name = String(required=True)
+    id = UUID(required=True)
+    name = Text(required=True, min=3)

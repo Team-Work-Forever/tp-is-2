@@ -10,7 +10,7 @@ class CreateTaster(Mutation):
     Output = TasterType
 
     def mutate(root, info, input: CreateTasterInput = None):
-        if input is None:
+        if not input:
             raise Exception('Please provide an input')
         
         return taster_repo.create(input.name, input.twitter_handle)

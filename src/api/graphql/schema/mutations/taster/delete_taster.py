@@ -1,11 +1,12 @@
-from graphene import Mutation, String
+from graphene import Mutation
+from schema.mutations.inputs.uuid_input import UUID
 
 from schema.types.taster_type import TasterType
 from schema import taster_repo, wine_repo
 
 class DeleteTaster(Mutation):
     class Arguments:
-        tasterId = String(required=True)
+        tasterId = UUID(required=True)
 
     Output = TasterType
 
