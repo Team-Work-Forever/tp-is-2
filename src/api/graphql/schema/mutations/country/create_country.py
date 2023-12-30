@@ -14,6 +14,9 @@ class CreateCountry(Mutation):
         if input is None:
             raise Exception('Please provide an input')
         
+        if not input.validate_fields():
+            raise Exception('Please provide a valid input')
+        
         if input.name is not None:
             country = country_repo.create(input.name)
         else:
