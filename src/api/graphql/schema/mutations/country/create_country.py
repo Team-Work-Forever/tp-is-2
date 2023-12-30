@@ -11,12 +11,12 @@ class CreateCountry(Mutation):
     Output = CountryType
 
     def mutate(root, info, input: CreateCountryInput = None):
-        if input is None:
+        if not input:
             raise Exception('Please provide an input')
         
-        if not input.validate_fields():
-            raise Exception('Please provide a valid input')
-        
+        # Validate input
+        input.validate_fields()
+
         if input.name is not None:
             country = country_repo.create(input.name)
         else:
