@@ -6,8 +6,17 @@ class Text(Scalar):
     __must_not_be_empty = "Please provide a text"
     __must_not_be_digit = "Please provide a valid text"
 
+    min = None
+    max = 25 # Default max length
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if 'min' in kwargs:
+            Text.min = kwargs['min']
+
+        if 'max' in kwargs:
+            Text.max = kwargs['max']
 
     @staticmethod
     def serialize(value):
@@ -19,7 +28,7 @@ class Text(Scalar):
             if not isinstance(node.value, str):
                 raise ValueError(Text.__must_be_str)
             
-            Text.validate_text(node.value, length=4)
+            Text.validate_text(node.value)
 
             return node.value
         except ValueError as e:
@@ -30,15 +39,19 @@ class Text(Scalar):
         return Text.parse_literal(value)
 
     @staticmethod
-    def validate_text(value, length: int = None):
+    def validate_text(value):
         if not value:
             raise ValueError(Text.__must_not_be_empty)
         
         if value.isdigit():
             raise ValueError(Text.__must_not_be_digit)
         
-        if length is not None:
-            if len(value) <= length:
-                raise ValueError(f'Please provide a text with a minimum of {length} characters')
+        if Text.min is not None:
+            if len(value) <= Text.min:
+                raise ValueError(f'Please provide a text with a minimum of {Text.min} characters')
+            
+        if Text.max is not None:
+            if len(value) >= Text.max:
+                raise ValueError(f'Please provide a text with a maximum of {Text.max} characters')
         
         return True

@@ -6,5 +6,5 @@ from schema.mutations.inputs.uuid_input import UUID
 
 class UpdateRegionInput(InputObjectType):
     id = UUID(required=True)
-    name = Text(required=False)
-    province = Text(required=False)
+    name = Text(required=False, min=3)
+    province = Text(required=False, min=3)

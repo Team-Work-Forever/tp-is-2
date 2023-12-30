@@ -8,7 +8,7 @@ from schema.mutations.inputs.validation_input import BaseValidationInput
 
 class CreateCountryInput(BaseValidationInput):
     id = UUID(required=False)
-    name = Text(required=False)
+    name = Text(required=False, min=3)
     regions = List(CreateRegionInput, required=False)
 
     def validate_fields(self) -> bool:
