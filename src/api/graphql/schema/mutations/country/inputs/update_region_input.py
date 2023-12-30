@@ -1,7 +1,10 @@
-from graphene import InputObjectType, String
+from graphene import InputObjectType
+from schema.mutations.inputs.text_input import Text
+
+from schema.mutations.inputs.uuid_input import UUID
 
 
 class UpdateRegionInput(InputObjectType):
-    id = String(required=True)
-    name = String(required=False)
-    province = String(required=False)
+    id = UUID(required=True)
+    name = Text(required=False)
+    province = Text(required=False)
