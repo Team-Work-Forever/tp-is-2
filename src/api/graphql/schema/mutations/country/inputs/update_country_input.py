@@ -1,7 +1,9 @@
-from ast import List
-from graphene import InputObjectType, String
+from graphene import InputObjectType
+
+from schema.mutations.inputs.text_input import Text
+from schema.mutations.inputs.uuid_input import UUID
 
 
 class UpdateCountryInput(InputObjectType):
-    id = String(required=True)
-    name = String(required=True)
+    id = UUID(required=True)
+    name = Text(required=True)

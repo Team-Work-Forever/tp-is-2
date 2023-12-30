@@ -1,11 +1,12 @@
-from graphene import Mutation, String
+from graphene import Mutation
 
 from schema import country_repo, wine_repo
+from schema.mutations.inputs.uuid_input import UUID
 from schema.types.region_type import RegionType
 
 class DeleteRegion(Mutation):
     class Arguments:
-        regionId = String(required=True)
+        regionId = UUID(required=True)
 
     Output = RegionType
 

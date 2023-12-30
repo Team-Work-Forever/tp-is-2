@@ -1,4 +1,4 @@
-from graphene import Mutation, String
+from graphene import Mutation
 from schema.mutations.country.inputs.update_country_input import UpdateCountryInput
 
 from schema.types.country_type import CountryType

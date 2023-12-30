@@ -1,11 +1,12 @@
-from graphene import Mutation, String
+from graphene import Mutation
+from schema.mutations.inputs.uuid_input import UUID
 
 from schema.types.country_type import CountryType
 from schema import country_repo
 
 class DeleteCountry(Mutation):
     class Arguments:
-        countryId = String(required=True)
+        countryId = UUID(required=True)
 
     Output = CountryType
 
