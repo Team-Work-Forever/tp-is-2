@@ -1,4 +1,5 @@
-from graphene import Mutation, String
+from graphene import Mutation
+from schema.mutations.inputs.uuid_input import UUID
 from schema.mutations.review.inputs.update_review_input import UpdateReviewInput
 
 from schema.types.review_type import ReviewType
@@ -6,7 +7,7 @@ from schema import wine_repo
 
 class UpdateReview(Mutation):
     class Arguments:
-        reviewId = String(required=True)
+        reviewId = UUID(required=True)
         input = UpdateReviewInput(required=True)
 
     Output = ReviewType

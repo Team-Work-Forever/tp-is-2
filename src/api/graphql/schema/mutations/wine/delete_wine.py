@@ -1,11 +1,12 @@
-from graphene import Mutation, String
+from graphene import Mutation
+from schema.mutations.inputs.uuid_input import UUID
 
 from schema.types.wine_type import WineType
 from schema import wine_repo
 
 class DeleteWine(Mutation):
     class Arguments:
-        wineId = String(required=True)
+        wineId = UUID(required=True)
 
     Output = WineType
 

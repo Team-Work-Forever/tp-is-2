@@ -6,11 +6,15 @@ class Text(Scalar):
     __must_not_be_empty = "Please provide a text"
     __must_not_be_digit = "Please provide a valid text"
 
+    field_name = 'Text'
     min = None
     max = 25 # Default max length
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if 'field_name' in kwargs:
+            Text.field_name = kwargs['field_name']
 
         if 'min' in kwargs:
             Text.min = kwargs['min']
@@ -55,3 +59,5 @@ class Text(Scalar):
                 raise ValueError(f'Please provide a text with a maximum of {Text.max} characters')
         
         return True
+    
+    

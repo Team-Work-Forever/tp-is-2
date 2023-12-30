@@ -1,11 +1,12 @@
-from graphene import Mutation, String
+from graphene import Mutation
+from schema.mutations.inputs.uuid_input import UUID
 from schema.mutations.review.inputs.create_review_input import CreateReviewInput
 from schema.types.review_type import ReviewType
 from schema import taster_repo, wine_repo
 
 class CreateReview(Mutation):
     class Arguments:
-        wineId = String(required=True)
+        wineId = UUID(required=True)
         input = CreateReviewInput(required=True)
 
     Output = ReviewType

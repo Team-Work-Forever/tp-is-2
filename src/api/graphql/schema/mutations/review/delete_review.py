@@ -1,11 +1,12 @@
-from graphene import Mutation, String
+from graphene import Mutation
+from schema.mutations.inputs.uuid_input import UUID
 
 from schema.types.review_type import ReviewType
 from schema import wine_repo
 
 class DeleteReview(Mutation):
     class Arguments:
-        reviewId = String(required=True)
+        reviewId = UUID(required=True)
 
     Output = ReviewType
 
