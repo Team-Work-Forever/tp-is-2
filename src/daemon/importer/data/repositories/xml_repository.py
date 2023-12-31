@@ -16,7 +16,7 @@ class XMLDataBaseRepository():
             VALUES (
                 %(file_name)s, 
                 %(xml)s
-            );"""
+            ) returning id;"""
         
         try:
             cursor.execute(insertImportedFile, {
@@ -24,5 +24,9 @@ class XMLDataBaseRepository():
                 "xml": xml_file_content
             })
 
+            return cursor.fetchone()[0]
+
         except psycopg2.Error as e:
+            print("Não me apetece registar nada")
+            print(e.pgerror)
             return

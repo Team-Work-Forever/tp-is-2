@@ -9,7 +9,7 @@ from utils.csv_reader_utils import split_csv_file, get_temp_folder, clean_temp_f
 
 from xml_generation.standard_xml_converter import CSVtoXMLConverter
 
-from data import CSVDataBaseRepository, XMLDataBaseRepository, UnitOfWork
+from data import CSVDataBaseRepository, XMLDataBaseRepository, UnitOfWork, RedisConnection
 
 class CSVHandler(FileSystemEventHandler):
     def __init__(self, input_path, output_path):
@@ -41,7 +41,7 @@ class CSVHandler(FileSystemEventHandler):
         converter = CSVtoXMLConverter(in_path)
 
         xml_content = converter.to_xml_str()
-        file = open(out_path, "w")
+        file = open(out_path, "w", encoding="utf-8")
         file.write(xml_content)
         print(f"new xml file generated: '{file.name}'")
         file.close()
@@ -69,7 +69,11 @@ class CSVHandler(FileSystemEventHandler):
             xml_path = self.__generate_unique_file_name(distination)
             xml_content = self.__convert_csv_to_xml(splited_file, xml_path)
 
-            self.xml_repository.save(xml_file_name=xml_path, xml_file_content=xml_content)
+            file_id: int = self.xml_repository.save(xml_file_name=xml_path, xml_file_content=xml_content)
+
+            # TODO: Publish to redis
+            RedisConnection().set_value(str(file_id), xml_content)
+            self.unit_of_work.save_changes()
 
         # delete all temp files
         clean_temp_folder(temp_folder_path)

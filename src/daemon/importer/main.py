@@ -1,5 +1,5 @@
 import time
-from data.db_access import DbConnection
+from data import DbConnection, RedisConnection
 
 from helpers.env_loader import Env
 from observer import FileObserver
@@ -9,6 +9,7 @@ Env.load("dev")
 
 # Initialize the database connection
 DbConnection()
+RedisConnection()
 
 # Get the CSV and XML volumes
 CSV_INPUT_PATH = Env.get_var("CSV_VOLUME")

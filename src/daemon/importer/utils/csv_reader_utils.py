@@ -45,7 +45,7 @@ def split_csv_file(csv_path: str, output_folder: str) -> [str]:
 
     # calculate how many splits
     total_lines = len(csvLines)
-    number_splits = math.ceil(total_lines * split_percentage)
+    number_splits = math.ceil(750) # split on 10k lines total_lines * split_percentage
 
     # Split file
     for i in range(len(csvLines)):
@@ -53,7 +53,7 @@ def split_csv_file(csv_path: str, output_folder: str) -> [str]:
             file_name = f'{csv_file_name}-{counter}.temp'
             write_lines = [header] + csvLines[i:i+number_splits]
 
-            split_csv = open(os.path.join(dir_path, file_name), 'w+')
+            split_csv = open(os.path.join(dir_path, file_name), 'w+', encoding='utf-8')
             split_csv.writelines(write_lines)
             splited_files.append(split_csv.name)
             
