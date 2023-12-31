@@ -17,17 +17,27 @@ class CreateCountry(Mutation):
         # Validate input
         input.validate_fields()
 
-        if input.name is not None:
-            country = country_repo.create(input.name)
-        else:
+        # Get or create country
+        if input.id:
             country = country_repo.get_by_id(input.id)
+
+        if input.name:
+            country = country_repo.get_by_name(input.name)
+
+            if country:
+                raise Exception('Country already exists')
+
+            country = country_repo.create(input.name)
 
         # Country does not exist
         if country is None:
             raise Exception('Country not found')
 
         if input.regions is not None:
-            country['regions'] = country_repo.create_many_regions(input.regions, country['id'])
+            country['regions'], not_inserted_regions = country_repo.create_many_regions(input.regions, country['id'])
+
+        if not_inserted_regions and len(not_inserted_regions) > 0:
+            raise Exception(f"Regions that already exists, therefore not inserted {','.join(not_inserted_regions)}")
 
         return country
         

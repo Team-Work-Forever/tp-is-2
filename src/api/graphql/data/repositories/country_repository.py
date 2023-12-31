@@ -31,6 +31,19 @@ class CountryRepository(BaseRepository):
         )
 
         return self._map_to_entity(cursor.fetchone(), mapper)
+    
+    def get_by_name(self, name: str, mapper = 'country'):
+        cursor = self._db_context.get_cursor()
+
+        cursor.execute(""" 
+            SELECT
+               *
+            FROM country
+            WHERE country.name = %s
+            """, (name,)
+        )
+
+        return self._map_to_entity(cursor.fetchone(), mapper)
 
     def create(self, name):
         cursor = self._db_context.get_cursor()
@@ -116,17 +129,25 @@ class CountryRepository(BaseRepository):
     
     def create_many_regions(self, regions, country_id):
         cursor = self._db_context.get_cursor()
+        inserted_regions = []
 
         for region in regions:
+            if self.get_region_by_name(region.name):
+                inserted_regions.append(region.name)
+                continue
+
             cursor.execute(""" 
-                INSERT INTO region (name, province, country_id)
-                VALUES (%s, %s, %s)
-                RETURNING *
-                """, (region.name, region.province, country_id)
+            INSERT INTO region (name, province, country_id)
+            VALUES (%s, %s, %s)
+            RETURNING *
+            """, (region.name, region.province, country_id)
             )
 
+        if inserted_regions and len(inserted_regions) > 0:
+            return None, inserted_regions
+
         self._db_context.commit()
-        return self._map_to_entity_collection(cursor.fetchall(), 'region')
+        return self._map_to_entity_collection(cursor.fetchall(), 'region'), None
 
     def get_regions_from_country(self, country_id, mapper = 'region'):
         cursor = self._db_context.get_cursor()
