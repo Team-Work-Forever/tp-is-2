@@ -1,15 +1,13 @@
 import sys
 
-from services import RPConnection
-from routes import app
-
 from utils import Env
+Env.load()
+
+from routes import app
+from services import RPConnection
 
 PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 7321
 
-Env.load("env")
-
-# Init RPC Connection
 try:
     RPConnection()
 except Exception as e:

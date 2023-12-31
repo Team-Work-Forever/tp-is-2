@@ -1,13 +1,11 @@
 import base64
 from flask import Blueprint, jsonify, request
 from errors.bad_request_error import BadRequestError
-from errors.conflitError import ConflitError
 from mappers import toFileDto, toMessage
 
 from utils import HttpStatus
 
 from services.rpc_connection import RPConnection
-import xmlrpc.client 
 
 
 xml = Blueprint('xml', __name__)
@@ -16,14 +14,17 @@ rpc_client = RPConnection()
 def encode_file(data):
     return base64.b64encode(data).decode('utf-8')
 
-def get_file_content(field_name: str = 'file'):
+def get_file_content(field_name: str = 'file', type = 'csv'):
     if field_name not in request.files:
-        return 'No file part in the request'
+        raise BadRequestError('No file part in the request')
 
     file = request.files['file']
 
     if file.filename == '':
-        return 'No selected file'
+        raise BadRequestError('No file selected for uploading')
+    
+    if not file.filename.endswith(type):
+        raise BadRequestError(f"Please provide a valid {type} file")
     
     return file.read(), file.filename
 
@@ -37,16 +38,10 @@ def validate_param(param: str, param_name: str, ex: str):
 # Import XML File
 @xml.route('/files/import', methods=['POST'])
 def import_xml_file():
-    try:
-        file_content, file_name = get_file_content()
-        file_content = encode_file(file_content)
+    file_content, file_name = get_file_content(type='csv')
+    file_content = encode_file(file_content)
 
-        rpc_client.upload_file_to_xml(file_name, file_content)
-
-    except xmlrpc.client.Fault as e:
-        raise BadRequestError("Please provide a valid CSV file")
-    except Exception as e:
-        raise ConflitError(str(e))
+    rpc_client.upload_file_to_xml(file_name, file_content)
 
     return jsonify(toMessage("File was imported!")), HttpStatus.CREATED
 
@@ -54,25 +49,16 @@ def import_xml_file():
 # TODO: Would be nice to have more information about the files
 @xml.route('/files/uploaded', methods=['GET'])
 def get_all_uploaded_files():
-    response = ''
-
-    try:
-        response = rpc_client.get_all_files()
-    except Exception as e:
-        raise ConflitError(str(e))
-
+    response = rpc_client.get_all_persisted_files()
+        
     return jsonify(response), HttpStatus.OK
 
 # Get Information about the Uploaded File
+# TODO: Get file
 @xml.route('/files/uploaded/<file_name>', methods=['GET'])
 def get_information_about_file(file_name: str):
     validate_param(file_name, "file_name", "dataset.csv")
-    response = ''
-
-    try:
-        response = rpc_client.get_file_info(file_name)
-    except Exception as e:
-        raise ConflitError(str(e))
+    response = rpc_client.get_file_info(file_name)
 
     return jsonify(toFileDto(response)), HttpStatus.OK
 
@@ -81,28 +67,14 @@ def get_information_about_file(file_name: str):
 @xml.route('/files/uploaded/<file_name>', methods=['DELETE'])
 def remove_uploaded_file(file_name: str):
     validate_param(file_name, "file_name", "dataset.csv")
-    response = ''
+    response = rpc_client.remove_record(file_name)
 
-    try:
-        response = rpc_client.remove_record(file_name)
-
-    except Exception as e:
-        raise ConflitError(str(e))
-    
     return jsonify(toMessage(response)), HttpStatus.ACCEPTED
 
 # # Upload and Validate XML File
 @xml.route('/files/uploaded/validate', methods=['POST'])
 def validate_xml_file():
-    response = ''
-    
-    try:
-        file_content, _ = get_file_content()
-        response = rpc_client.validate_xml_file(file_content.decode('utf-8'))
-
-    except ValueError as e:
-        raise BadRequestError("Please enter a valid XML file")
-    except Exception as e:
-        raise ConflitError(str(e))
+    file_content, _ = get_file_content(type='xml')
+    response = rpc_client.validate_xml_file(file_content)
 
     return jsonify(toMessage(response)), HttpStatus.ACCEPTED

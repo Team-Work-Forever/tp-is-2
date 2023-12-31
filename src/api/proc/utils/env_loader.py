@@ -5,13 +5,13 @@ from dotenv import load_dotenv, find_dotenv
 class Env():
 
     @staticmethod
-    def load(enviroment):
+    def load(enviroment = None):
         if enviroment:
             enviroment = f'.env.{enviroment}'
         else:
             enviroment = '.env'
-
-        script_path = find_dotenv()
+        
+        script_path = find_dotenv(filename=enviroment)
         load_dotenv(dotenv_path=script_path)
 
     @staticmethod
