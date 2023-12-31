@@ -1,36 +1,51 @@
 import signal, sys
+
+from helpers import Env
+
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-from functions.string_length import string_length
-from functions.string_reverse import string_reverse
+from data import DbConnection, RedisConnection
+from functions import load_handlers_by_assembly
 
-PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 9000
+if len(sys.argv) > 1:
+    enviroment = sys.argv[1]
+else:
+    enviroment = 'prod'
 
-if __name__ == "__main__":
-    class RequestHandler(SimpleXMLRPCRequestHandler):
-        rpc_paths = ('/RPC2',)
+Env.load(enviroment)
 
-    with SimpleXMLRPCServer(('localhost', PORT), requestHandler=RequestHandler) as server:
-        server.register_introspection_functions()
+redisAccess = RedisConnection()
+dbAccess = DbConnection()
 
-        def signal_handler(signum, frame):
-            print("received signal")
-            server.server_close()
+class RequestHandler(SimpleXMLRPCRequestHandler):
+    rpc_paths = ('/RPC2',)
 
-            # perform clean up, etc. here...
-            print("exiting, gracefully")
-            sys.exit(0)
+register_methods = load_handlers_by_assembly()
 
-        # signals
-        signal.signal(signal.SIGTERM, signal_handler)
-        signal.signal(signal.SIGHUP, signal_handler)
-        signal.signal(signal.SIGINT, signal_handler)
+with SimpleXMLRPCServer(('0.0.0.0', 9000), requestHandler=RequestHandler) as server:
+    server.register_introspection_functions()
 
-        # register both functions
-        server.register_function(string_reverse)
-        server.register_function(string_length)
+    def signal_handler(signum, frame):
+        print("received signal")
+        server.server_close()
+        
+        redisAccess.disconnect()
+        dbAccess.disconnect()
 
-        # start the server
-        print(f"Starting the RPC Server in port {PORT}...")
-        server.serve_forever()
+        print("exiting, gracefully")
+        sys.exit(0)
+
+
+    # signals
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGHUP, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
+
+    # register both functions
+    for method in register_methods:
+        server.register_function(method.handle, method.get_name())
+
+    # start the server
+    print("Starting the RPC Server...")
+    server.serve_forever()
