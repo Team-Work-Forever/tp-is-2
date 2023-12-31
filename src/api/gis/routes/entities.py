@@ -1,11 +1,12 @@
-from errors.bad_request_error import BadRequestError
-from flask import Blueprint, jsonify, request
-from jsonschema import validate, ValidationError
 
+from flask import Blueprint, jsonify, request
+from jsonschema import validate
+from errors.bad_request_error import BadRequestError
 from services.repositories.mark_repository import MarkRepository
 
+
 mark_repository = MarkRepository()
-markers = Blueprint('markers', __name__, url_prefix="/markers")
+entities = Blueprint('entities', __name__, url_prefix="/entity")
 
 json_schema = {
     "type": "object",
@@ -27,30 +28,18 @@ json_schema = {
     "additionalProperties": False
 }
 
-# Get countries
-@markers.route("/")
-def get_markers():
-    return "Hello, World!"
 
-@markers.route("/<region_name>", methods=["POST"])
-def set_markers(region_name: str):
+@entities.route("/<region_name>", methods=["PATCH"])
+def set_tiles(region_name: str):
     req = request.get_json()
 
     # Does not exist any region
     if mark_repository.check_if_region_exists(region_name) is False:
         raise BadRequestError("Region does not exist")
 
-    try:
-        validate(req, json_schema)
-    except ValidationError as e:
-        print(e.message)
-        raise BadRequestError(e.message)
-    
+    validate(req, json_schema)
+
     # Update on the database
-    try:
-        mark_repository.update_gis_mark(region_name, req["lat"], req["lon"])
-    except Exception as e:
-        print(e)
-        raise BadRequestError("Error updating the database")
+    mark_repository.update_gis_mark(region_name, req["lat"], req["lon"])
 
     return jsonify(request.get_json())

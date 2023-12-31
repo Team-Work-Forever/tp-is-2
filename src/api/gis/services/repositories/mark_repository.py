@@ -4,6 +4,35 @@ class MarkRepository():
     def __init__(self) -> None:
         self._db_context = DbConnection()
 
+    def get_selected_region(self, neLat: float = 0, neLon: float = 0, swLat: float = 0, swLon: float = 0):
+        cursor = self._db_context.get_cursor()
+        where_statement = ''
+
+        if neLat != 0 and neLon != 0 and swLat != 0 and swLon != 0:
+            where_statement = 'WHERE ST_Intersects(coordinates, ST_MakeEnvelope(%s, %s, %s, %s, 4326))'
+
+        cursor.execute("""
+            SELECT
+                jsonb_build_object(
+                    'type', 'FeatureCollection',
+                    'features', jsonb_agg(
+                        jsonb_build_object(
+                            'type', 'Feature',
+                            'id', r.id,
+                            'geometry', st_asgeojson(r.coordinates)::jsonb,
+                            'properties', to_jsonb(r) - 'id' - 'coordinates' - 'deleted_at' - 'country_id' || jsonb_build_object('country_name', c.name)
+                        )
+                    )
+                ) AS geojson
+            FROM
+                region r
+            INNER JOIN
+                country c ON r.country_id = c.id
+            """ + where_statement + """
+        """, (neLat, neLon, swLat, swLon,))
+
+        return cursor.fetchall()
+
     def check_if_region_exists(self, region_name):
         cursor = self._db_context.get_cursor()
 
