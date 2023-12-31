@@ -1,8 +1,6 @@
 import os, math
 import shutil
 
-from csv import DictReader
-
 def get_temp_folder(output_path: str) -> str:
     """
     Create a temp folder in the output path
@@ -23,14 +21,15 @@ def clean_temp_folder(temp_folder: str) -> None:
     if os.path.exists(temp_folder):
         shutil.rmtree(temp_folder)
 
-def split_csv_file(csv_path: str, output_folder: str) -> [str]:
+def split_csv_file(csv_path: str, output_folder: str, split_number: int = 10) -> [str]:
     """
     Split a csv file into multiple files
 
     return a list of file paths
     """
     splited_files = []
-    split_percentage = 0.25
+    split_percentage = 1 / split_number
+    print(f"Splitting the file into {split_percentage}% parts...")
     counter = 0
     dir_path = output_folder
     csv_file_name = os.path.basename(csv_path)
@@ -45,10 +44,12 @@ def split_csv_file(csv_path: str, output_folder: str) -> [str]:
 
     # calculate how many splits
     total_lines = len(csvLines)
-    number_splits = math.ceil(750) # split on 10k lines total_lines * split_percentage
+    number_splits = math.ceil(total_lines * split_percentage) # split on 10k lines 
 
     # Split file
     for i in range(len(csvLines)):
+
+        # If devide all lines by the number of splits, and the rest is 0, then we have a new file
         if i % number_splits == 0:
             file_name = f'{csv_file_name}-{counter}.temp'
             write_lines = [header] + csvLines[i:i+number_splits]
@@ -60,5 +61,3 @@ def split_csv_file(csv_path: str, output_folder: str) -> [str]:
             counter += 1
 
     return splited_files
-
-    
