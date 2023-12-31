@@ -36,8 +36,8 @@ class CreateCountry(Mutation):
         if input.regions is not None:
             country['regions'], not_inserted_regions = country_repo.create_many_regions(input.regions, country['id'])
 
-        if not_inserted_regions and len(not_inserted_regions) > 0:
-            raise Exception(f"Regions that already exists, therefore not inserted {','.join(not_inserted_regions)}")
+            if not_inserted_regions and len(not_inserted_regions) > 0:
+                raise Exception(f"Regions that already exists, therefore not inserted {','.join(not_inserted_regions)}")
 
         return country
         
