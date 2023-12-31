@@ -6,3 +6,8 @@ pandas==2.1.4
 flask==3.0.0
 flask-magql==1.0.0
 python-dotenv==1.0.0
+redis==5.0.1
+psycopg2-binary==2.9.9
+lxml==4.9.3
+requests==2.31.0
+httpx==0.25.2

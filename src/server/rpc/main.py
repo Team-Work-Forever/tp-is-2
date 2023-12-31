@@ -13,7 +13,7 @@ if len(sys.argv) > 1:
 else:
     enviroment = 'prod'
 
-Env.load(enviroment)
+Env.load('prod')
 
 redisAccess = RedisConnection()
 dbAccess = DbConnection()

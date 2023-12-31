@@ -1,4 +1,3 @@
-import os
 import psycopg2
 
 from helpers import Env
@@ -69,17 +68,19 @@ class ConvertToXmlHandler(Handler):
         finally:
             delete_temp_file(self.TEMP_FILE)
 
-        query = """
-            INSERT INTO imported_documents 
-            (file_name, xml)
-            VALUES 
-            (%(file_name)s, %(xml)s);
-        """
-
+        insertImportedFile = """
+            INSERT INTO public.imported_documents(
+                file_name,
+                xml)
+            VALUES (
+                %(file_name)s, 
+                %(xml)s
+            ) returning id;"""
+        
         try:
-            cursor.execute(query, {
-                'file_name': file_name,
-                'xml': xml_result
+            cursor.execute(insertImportedFile, {
+                "file_name": file_name,
+                "xml": xml_result
             })
 
         except psycopg2.errors.UniqueViolation as e:
