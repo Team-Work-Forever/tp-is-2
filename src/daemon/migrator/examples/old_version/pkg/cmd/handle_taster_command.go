@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"migrator/pkg/api"
-	"migrator/pkg/xml_reader/entities"
+	"migrator/pkg/entities"
 )
 
 type HandleTasterCommand struct {
