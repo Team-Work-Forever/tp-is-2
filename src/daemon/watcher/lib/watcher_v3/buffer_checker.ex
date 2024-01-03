@@ -3,7 +3,7 @@ defmodule WatcherV3.BufferChecker do
 
   require Logger
 
-  @max_threads 10 # active threads
+  @max_threads 20 # active threads
   @wait_for_secods 200 # in seconds
 
   defmodule ProcessBatch do
@@ -81,22 +81,19 @@ defmodule WatcherV3.BufferChecker do
     number_of_retrived_data = @max_threads - state.active_threads
     {buffer_data, all_elements} = WatcherV3.BufferListener.get_buffer_data(number_of_retrived_data)
 
-    IO.puts(
-      """
-      Max Threads: #{@max_threads}
-      Processed: #{1}
-      Active Threads: #{state.active_threads}
-      Next: #{length(buffer_data)}
-      Incoming Messages: #{length(all_elements)}
-      """
-      )
+    IO.puts("\e[H\e[J"); IEx.dont_display_result
+    IO.write("\rMax Threads: #{@max_threads} \n")
+    IO.write("Active Threads: #{state.active_threads}  \n")
+    IO.write("Next: #{length(buffer_data)}  \n")
+    IO.write("Incoming Messages: #{length(all_elements)} \n")
+    IO.write("Processed Messages: #{length(state.already_processed)} \n")
 
     # Verify which threads are still alive
     # Remove dead threads from state
-    updated_pids =
-      Enum.filter(state.pids, fn process_batch ->
-        Process.alive?(process_batch.process_id)
-      end)
+    {updated_pids, dead_pids} =
+        Enum.split_with(state.pids, fn pb ->
+          Process.alive?(pb.process_id)
+        end)
 
     # Spawn new threads
     new_pids =
@@ -111,7 +108,7 @@ defmodule WatcherV3.BufferChecker do
         acc_pids ++ [process_batch]
       end)
 
-    state = %State{state | pids: new_pids, active_threads: length(new_pids)}
+    state = %State{state | pids: new_pids, active_threads: length(new_pids), already_processed: state.already_processed ++ dead_pids}
 
     # Replay buffer_data to threads
     schedule_periodic_check()
