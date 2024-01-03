@@ -11,8 +11,10 @@ config :watcher, Watcher.Services.Repo,
   username: env!("DB_USER", :string!, "is"),
   password: env!("DB_PASSWORD", :string!, "is"),
   hostname: env!("DB_HOST", :string!, "localhost"),
-  port: env!("DB_PORT", :integer)
+  port: env!("DB_PORT", :integer),
+  types: Watcher.Types.PostgrexTypes
 
+config :logger, level: :info
 config :watcher, ecto_repos: [Watcher.Services.Repo]
 
 config :watcher, :redis,

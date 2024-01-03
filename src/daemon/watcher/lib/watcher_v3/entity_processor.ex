@@ -9,6 +9,9 @@ defmodule WatcherV3.EntityProcessor do
       entities = XmlParser.Parser.parse(payload)
       process_entities(entities, rabbitMq_channel)
 
+      # Update the imported_documents table
+      Watcher.Services.ImportedDocuments.set_to_migrated(xml_id)
+
       :ok
     catch
       e ->
