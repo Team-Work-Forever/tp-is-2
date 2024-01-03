@@ -4,8 +4,9 @@ defmodule Watcher.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      Watcher.Repo,
-      Watcher.NotificationListener
+      Watcher.Services.Repo,
+      WatcherV3.BufferListener,
+      WatcherV3.BufferChecker
     ]
 
     opts = [strategy: :one_for_one, name: Watcher.Supervisor]
