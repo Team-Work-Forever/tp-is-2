@@ -25,7 +25,8 @@ defmodule Watcher.MixProject do
       {:amqp, "~> 3.3"},
       {:redix, "~> 1.3"},
       {:sweet_xml, "~> 0.7.4"},
-      {:poison, "~> 5.0"}
+      {:poison, "~> 5.0"},
+      {:dotenvy, "~> 0.8.0"}
     ]
   end
 end

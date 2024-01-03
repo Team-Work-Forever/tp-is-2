@@ -1,13 +1,13 @@
 defmodule Watcher.Services.Redis do
   alias Redix
 
-  @redis_config Application.compile_env(:watcher, Watcher.Services.Redis)
-
   @spec connect() :: {:ok, Redix.t()}
   def connect() do
-    host = Keyword.get(@redis_config, :host)
-    port = Keyword.get(@redis_config, :port)
-    db = Keyword.get(@redis_config, :db)
+    configuration = Application.fetch_env!(:watcher, :redis)
+
+    host = Keyword.get(configuration, :host)
+    port = Keyword.get(configuration, :port)
+    db = Keyword.get(configuration, :db)
 
     Redix.start_link("redis://#{host}:#{port}/#{db}")
   end
@@ -28,7 +28,8 @@ defmodule Watcher.Services.Redis do
              | integer()
              | Redix.Error.t()}
   def set_value(redis_connection, key, value) do
-    expire_at = Keyword.get(@redis_config, :expire_at)
+    configuration = Application.get_env(:watcher, Watcher.Services.Redis)
+    expire_at = Keyword.get(configuration, :expire_at)
 
     Redix.command(redis_connection, ["SET", key, value])
     Redix.command(redis_connection, ["EXPIRE", key, expire_at])

@@ -8,8 +8,6 @@ defmodule Watcher.Services.RabbitMQ do
 
   require Logger
 
-  @rabbit_config Application.compile_env(:watcher, Watcher.Services.RabbitMQ)
-
   @spec setup_connection() :: {:ok, AMQP.Channel.t()}
   def setup_connection() do
     try do
@@ -29,18 +27,21 @@ defmodule Watcher.Services.RabbitMQ do
 
   @spec build_rabbitmq_url() :: String.t()
   defp build_rabbitmq_url() do
-    host = Keyword.get(@rabbit_config, :host)
-    port = Keyword.get(@rabbit_config, :port)
-    username = Keyword.get(@rabbit_config, :username)
-    password = Keyword.get(@rabbit_config, :password)
-    virtual_host = Keyword.get(@rabbit_config, :virtual_host)
+    config = Application.fetch_env!(:watcher, :rabbitmq)
+
+    host = Keyword.get(config, :host)
+    port = Keyword.get(config, :port)
+    username = Keyword.get(config, :username)
+    password = Keyword.get(config, :password)
+    virtual_host = Keyword.get(config, :virtual_host)
 
     "amqp://#{username}:#{password}@#{host}:#{port}/#{virtual_host}"
   end
 
   @spec create_and_bind_queue(AMQP.Channel.t()) :: :ok
   defp create_and_bind_queue(channel) do
-    queues = Keyword.get(@rabbit_config, :queues)
+    config = Application.fetch_env!(:watcher, :rabbitmq)
+    queues = Keyword.get(config, :queues)
 
     Enum.each(queues, fn {queue, exchange, routing_key} ->
       Queue.declare(channel, queue)
@@ -52,7 +53,8 @@ defmodule Watcher.Services.RabbitMQ do
   @spec publish_message(AMQP.Channel.t(), String.t(), any()) ::
           :ok | {:error, :blocked | :closing}
   def publish_message(channel, router_key, message) do
-    exchange = Keyword.get(@rabbit_config, :exchange)
+    config = Application.fetch_env!(:watcher, :rabbitmq)
+    exchange = Keyword.get(config, :exchange)
 
     Basic.publish(channel, exchange, router_key, Poison.encode!(message))
   end
