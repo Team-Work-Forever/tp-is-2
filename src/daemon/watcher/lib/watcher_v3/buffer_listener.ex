@@ -23,7 +23,7 @@ defmodule WatcherV3.BufferListener do
     {:ok, %State{buffer: []}}
   end
 
-  @spec get_buffer_data(integer()) :: {:ok, list()} | {:error, any()}
+  @spec get_buffer_data(integer()) :: {list(), list()}
   def get_buffer_data(slice) do
     GenServer.call(__MODULE__, {:get_buffer_data, slice})
   end

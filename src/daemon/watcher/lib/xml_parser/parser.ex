@@ -12,13 +12,9 @@ defmodule XmlParser.Parser do
   @spec parse(String.t()) :: [Country.t() | Taster.t() | Wine.t() | Review.t()]
   def parse(xml_string) do
     countries = country_from_xml(xml_string)
-    Logger.debug("Countries Done")
     tasters = taster_from_xml(xml_string)
-    Logger.debug("Tasters Done")
     wines = wine_from_xml(xml_string, countries)
-    Logger.debug("Wines Done")
     reviews = review_from_xml(xml_string, tasters, wines)
-    Logger.debug("Reviews Done")
 
     countries ++ tasters ++ wines ++ reviews
   end

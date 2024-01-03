@@ -3,14 +3,11 @@ defmodule WatcherV3.EntityProcessor do
 
   @spec process_request(Redix.t(), AMQP.Channel.t(), String.t()) :: :ok
   def process_request(redis_connection, rabbitMq_channel, xml_id) do
-    IO.puts("Processing request for #{inspect(redis_connection)} #{inspect(rabbitMq_channel)} #{xml_id}")
-
     try do
       {:ok, payload} = Watcher.Services.Redis.get_value(redis_connection, xml_id)
 
       entities = XmlParser.Parser.parse(payload)
       process_entities(entities, rabbitMq_channel)
-      Logger.debug("Processed #{length(entities)} entities #{xml_id}")
 
       :ok
     catch
