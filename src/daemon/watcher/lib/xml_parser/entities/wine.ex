@@ -1,5 +1,6 @@
 defmodule XmlParser.Entities.Wine do
   @type t :: %__MODULE__{
+          id: String.t(),
           price: String.t(),
           designation: String.t(),
           region: String.t(),
@@ -8,5 +9,5 @@ defmodule XmlParser.Entities.Wine do
           title: String.t()
         }
 
-  defstruct [:price, :designation, :region, :variaty, :winery, :title]
+  defstruct [:id, :price, :designation, :region, :variaty, :winery, :title]
 end

@@ -1,15 +1,15 @@
 import Config
 
-config :watcher, Watcher.Repo,
+config :watcher, Watcher.Services.Repo,
   database: "is",
   username: "is",
   password: "is",
   hostname: "localhost",
   port: 10001
 
-config :watcher, ecto_repos: [Watcher.Repo]
+config :watcher, ecto_repos: [Watcher.Services.Repo]
 
-config :watcher, Watcher.Redis,
+config :watcher, Watcher.Services.Redis,
   host: "localhost",
   port: 6379,
   db: 0,

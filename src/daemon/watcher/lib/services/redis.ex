@@ -1,7 +1,7 @@
-defmodule Watcher.Redis do
+defmodule Watcher.Services.Redis do
   alias Redix
 
-  @redis_config Application.compile_env(:watcher, Watcher.Redis)
+  @redis_config Application.compile_env(:watcher, Watcher.Services.Redis)
 
   @spec connect() :: {:ok, Redix.t()}
   def connect() do
@@ -32,6 +32,25 @@ defmodule Watcher.Redis do
 
     Redix.command(redis_connection, ["SET", key, value])
     Redix.command(redis_connection, ["EXPIRE", key, expire_at])
+  end
+
+  @spec get_value(atom() | pid() | {atom(), any()} | {:via, atom(), any()}, any()) ::
+          {:error,
+           atom()
+           | %{
+               :__exception__ => true,
+               :__struct__ => Redix.ConnectionError | Redix.Error,
+               optional(:message) => binary(),
+               optional(:reason) => atom()
+             }}
+          | {:ok,
+             nil
+             | binary()
+             | [nil | binary() | list() | integer() | Redix.Error.t()]
+             | integer()
+             | Redix.Error.t()}
+  def get_value(redis_connection, key) do
+    Redix.command(redis_connection, ["GET", key])
   end
 
   @spec remove_value(atom() | pid() | {atom(), any()} | {:via, atom(), any()}, any()) ::

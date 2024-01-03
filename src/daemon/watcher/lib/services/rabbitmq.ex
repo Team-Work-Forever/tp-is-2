@@ -22,8 +22,7 @@ defmodule Watcher.Services.RabbitMQ do
 
       {:ok, channel}
     catch
-      exception ->
-        IO.puts("Unexpected error in setup_connection: #{inspect(exception)}")
+      _exception ->
         Process.exit(self(), :kill)
     end
   end

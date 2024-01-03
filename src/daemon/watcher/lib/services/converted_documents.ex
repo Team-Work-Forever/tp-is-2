@@ -1,4 +1,4 @@
-defmodule Watcher.ConvertedDocuments do
+defmodule Watcher.Services.ConvertedDocuments do
   use Ecto.Schema
 
   schema "converted_documents" do
