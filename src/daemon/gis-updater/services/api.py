@@ -7,7 +7,7 @@ class Api():
 
     async def _make_request(self, method: str, path: str, json = None):
         async with httpx.AsyncClient() as client:
-            print(f"Making request to {self.BASE_URL + path}")
+            # print(f"Making request to {self.BASE_URL + path}")
             response = await client.request(method, self.BASE_URL + path, json=json)
 
         response.raise_for_status()
