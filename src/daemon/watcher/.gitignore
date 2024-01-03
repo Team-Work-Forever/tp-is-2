@@ -2,6 +2,8 @@
 /_build/
 .vscode
 
+.env
+
 .elixir_ls/
 
 # If you run "mix test --cover", coverage assets end up here.
