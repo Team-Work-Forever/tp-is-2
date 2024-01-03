@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"migrator/pkg/api"
-	"migrator/pkg/xml_reader/entities"
+	"migrator/pkg/entities"
 	"strings"
 
 	"github.com/antchfx/xmlquery"
