@@ -51,7 +51,7 @@ defmodule Watcher.Services.Redis do
              | integer()
              | Redix.Error.t()}
   def get_value(redis_connection, key) do
-    Redix.command(redis_connection, ["GET", key])
+    Redix.command(redis_connection, ["GETDEL", key])
   end
 
   @spec remove_value(atom() | pid() | {atom(), any()} | {:via, atom(), any()}, any()) ::
