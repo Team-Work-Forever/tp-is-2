@@ -26,7 +26,7 @@ func LoadEnv(path string) error {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		return err
+		viper.Reset()
 	}
 
 	config = &Config{
@@ -39,9 +39,9 @@ func LoadEnv(path string) error {
 		RABBIT_MQ_PASSWORD:     viper.GetString("RABBIT_MQ_PASSWORD"),
 		RABBIT_MQ_VIRTUAL_HOST: viper.GetString("RABBIT_MQ_VIRTUAL_HOST"),
 		RABBIT_MQ_EXCHANGE:     viper.GetString("RABBIT_MQ_EXCHANGE"),
-		RABBIT_MQ_QUEUE:        viper.GetString("RABBIT_MQ_QUEUE"),
+		RABBIT_MQ_QUEUE:        viper.GetString("RABBIT_MQ_QUEUE_ENTITIES"),
 		RABBIT_MQ_ROUTING_KEY:  viper.GetString("RABBIT_MQ_ROUTING_KEY"),
-		API_ENTITIES_URL:       viper.GetString("API_ENTITIES_URL"),
+		API_ENTITIES_URL:       viper.GetString("MIGRATOR_API_URL"),
 	}
 
 	return nil
