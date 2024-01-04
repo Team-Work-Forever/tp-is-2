@@ -12,8 +12,8 @@ DbConnection()
 RedisConnection()
 
 # Get the CSV and XML volumes
-CSV_INPUT_PATH = Env.get_var("CSV_VOLUME")
-XML_OUTPUT_PATH = Env.get_var("XML_VOLUME")
+CSV_INPUT_PATH = Env.get_var("IMPORTER_CSV_VOLUME")
+XML_OUTPUT_PATH = Env.get_var("IMPORTER_XML_VOLUME")
 
 # Initialize the file observer
 observer = FileObserver()
