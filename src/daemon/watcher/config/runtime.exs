@@ -7,11 +7,11 @@ source!([
 ])
 
 config :watcher, Watcher.Services.Repo,
-  database: env!("DB_DATABASE", :string!, "is"),
-  username: env!("DB_USER", :string!, "is"),
-  password: env!("DB_PASSWORD", :string!, "is"),
-  hostname: env!("DB_HOST", :string!, "localhost"),
-  port: env!("DB_PORT", :integer),
+  database: env!("PG_XML_DATABASE", :string!, "is"),
+  username: env!("PG_XML_USER", :string!, "is"),
+  password: env!("PG_XML_PASSWORD", :string!, "is"),
+  hostname: env!("PG_XML_HOST", :string!, "localhost"),
+  port: env!("PG_XML_PORT", :integer),
   types: Watcher.Types.PostgrexTypes
 
 config :logger, level: :info
