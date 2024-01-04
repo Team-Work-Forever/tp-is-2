@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalFilters(new ConflitExceptionFilter());
   app.useGlobalFilters(new ZodExceptionFilter());
 
-  await app.listen(process.env.API_ENTITIES_PORT);
+  await app.listen(process.env.API_PORT);
 }
 
 bootstrap();
