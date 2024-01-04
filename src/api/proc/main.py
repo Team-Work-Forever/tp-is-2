@@ -14,4 +14,4 @@ except Exception as e:
     print(f"Error: {e}")
 
 app.config["DEBUG"] = True
-app.run(host=Env.get_var("API_POSC_HOST"), port=Env.get_var("API_POSC_PORT"))
+app.run(host=Env.get_var("API_PROC_HOST"), port=Env.get_var("API_PORT"))
