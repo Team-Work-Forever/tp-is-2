@@ -16,4 +16,4 @@ from routes import app
 
 # Start the server
 app.config["DEBUG"] = True
-app.run(host=Env.get_var("API_GIS_HOST"), port=Env.get_var("API_GIS_PORT"))
+app.run(host=Env.get_var("API_GIS_HOST"), port=Env.get_var("API_PORT"))

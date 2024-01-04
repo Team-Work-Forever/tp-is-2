@@ -18,7 +18,7 @@ services:
       test: ["CMD", "pg_isready"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
 
   # Database to store Relational data
   db-rel:
@@ -36,7 +36,7 @@ services:
       test: ["CMD", "pg_isready"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
 
   # # Container that automatically converts CSV to XML and then imports the XML to db-xml
   importer:
@@ -113,6 +113,45 @@ services:
       db-rel:
         condition: service_healthy
 
+  # # Container that runs the API for gis
+  api-gis:
+    container_name: api-gis
+    build: docker/images/python
+    volumes:
+      - ./src/api/gis:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    ports:
+      - "${EXT_API_GIS_PORT}:${API_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      db-rel:
+        condition: service_healthy
+    
+    # # Container that runs the API for procedures
+  api-proc:
+    container_name: api-proc
+    build: docker/images/python
+    volumes:
+      - ./src/api/proc:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    ports:
+      - "${EXT_API_PROC_PORT}:${API_PORT}"
+    env_file:
+      - .env
+
+  # Container that runs the API for graphql
+  api-graphql:
+    container_name: api-graphql
+    build: docker/images/python
+    volumes:
+      - ./src/api/graphql:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    ports:
+      - "${EXT_API_GRAPHQL_PORT}:${API_PORT}"
+    env_file:
+      - .env
+
   # # Container that runs the web interface for displaying entities
   # frontend-ent:
   #   container_name: frontend-ent
@@ -163,42 +202,6 @@ services:
   #     - api-proc
   #     - api-graphql
 
-  # # Container that runs the API for gis
-  # api-gis:
-  #   container_name: api-gis
-  #   build: docker/images/python
-  #   volumes:
-  #     - ./src/api/gis:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_API_GIS_PORT}:${API_PORT}"
-  #   environment:
-  #     API_PORT: ${API_PORT}
-
-  # # Container that runs the API for procedures
-  # api-proc:
-  #   container_name: api-proc
-  #   build: docker/images/python
-  #   volumes:
-  #     - ./src/api/proc:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_API_PROC_PORT}:${API_PORT}"
-  #   environment:
-  #     API_PORT: ${API_PORT}
-
-  # # Container that runs the API for graphql
-  # api-graphql:
-  #   container_name: api-graphql
-  #   build: docker/images/python
-  #   volumes:
-  #     - ./src/api/graphql:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_API_GRAPHQL_PORT}:${API_PORT}"
-  #   environment:
-  #     API_PORT: ${API_PORT}
-
   # # Container that runs a golang exmaple
   # golang-example:
   #   container_name: golang-example
@@ -238,9 +241,9 @@ services:
       - "${RABBIT_MQ_UI_PORT}:15672" # management interface port
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "ping", "-q" ]
-      interval: 30s
+      interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 15
 
 volumes:
   xml-data:
