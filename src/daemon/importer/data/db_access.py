@@ -9,12 +9,14 @@ class DbConnection(metaclass=SingletonMeta):
         self._connect()
 
     def _connect(self):
+        print("Connecting to database...")
+
         self._connection = psycopg2.connect(
-            user=Env.get_var("DB_USER"),
-            password=Env.get_var("DB_PASSWORD"),
-            host=Env.get_var("DB_HOST"),
-            port=Env.get_var("DB_PORT"),
-            database=Env.get_var("DB_DATABASE"))
+            user=Env.get_var("PG_XML_USER"),
+            password=Env.get_var("PG_XML_PASSWORD"),
+            host=Env.get_var("PG_XML_HOST"),
+            port=Env.get_var("PG_XML_PORT"),
+            database=Env.get_var("PG_XML_DATABASE"))
         
     def get_cursor(self):
         return self._connection.cursor()

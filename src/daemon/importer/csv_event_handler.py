@@ -60,7 +60,7 @@ class CSVHandler(FileSystemEventHandler):
         # split the file in multiple CSVs files
         # convert each file into XML name would be CSV_FILE_NAME-UUID.xml
         temp_folder_path = get_temp_folder(os.path.dirname(csv_path))
-        n = int(Env.get_var("NUM_XML_PARTS"))
+        n = int(Env.get_var("IMPORTER_NUM_XML_PARTS"))
         print(f"Splitting the file into {n} parts...")
         splited_files = split_csv_file(csv_path, temp_folder_path, n)
 

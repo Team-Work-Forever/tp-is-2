@@ -6,7 +6,7 @@ from helpers import Env
 
 class XMLValidator():
     def __init__(self):
-        self.XSD_SCHEMA = os.path.join(Env.get_var("SCHEMA_DIR"), Env.get_var("SCHEMA_FILE"))
+        self.XSD_SCHEMA = os.path.join(Env.get_var("IMPORTER_SCHEMA_DIR"), Env.get_var("IMPORTER_SCHEMA_FILE"))
         self._schema = etree.XMLSchema(etree.parse(self.XSD_SCHEMA))
     
     def is_valid_from_string(self, root_string):
