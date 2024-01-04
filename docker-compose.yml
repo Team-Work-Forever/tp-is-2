@@ -51,8 +51,19 @@ services:
     depends_on:
       db-xml:
         condition: service_healthy
-
-  # watcher
+  
+  # # Container that runs a elixir exmaple
+  watcher:
+    container_name: watcher
+    build: docker/images/elixir
+    volumes:
+      - ./src/daemon/watcher:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    env_file:
+      - .env
+    depends_on:
+      - importer
+      - db-xml
 
   # # Container that automatically migrates data from db-xml to db-rel
   migrator:
@@ -64,8 +75,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - db-xml
-      - db-rel
+      - watcher
 
   # # Container that automatically migrates data from db-xml to db-rel
   gis-updater:
@@ -79,9 +89,6 @@ services:
     depends_on:
       broker:
         condition: service_healthy
-
-      # - api-gis
-      # - api-entities
 
   # # Container that runs the RPC server
   rpc-server:
@@ -151,76 +158,6 @@ services:
       - "7322:${API_PORT}"
     env_file:
       - .env
-
-  # # Container that runs the web interface for displaying entities
-  # frontend-ent:
-  #   container_name: frontend-ent
-  #   build: docker/images/web
-  #   volumes:
-  #     - ./src/frontend/ent:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_PORT_FRONTEND_ENT}:${EXT_PORT_FRONTEND_ENT}"
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     WEB_PORT: ${EXT_PORT_FRONTEND_ENT}
-  #     API_ENTITIES_URL: "localhost:${EXT_PORT_API_ENTITIES}"
-  #   depends_on:
-  #     - api-entities
-
-  # # Container that runs the web interface for displaying the map
-  # frontend-gis:
-  #   container_name: frontend-gis
-  #   build: docker/images/web
-  #   volumes:
-  #     - ./src/frontend/gis:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_PORT_FRONTEND_GIS}:${EXT_PORT_FRONTEND_GIS}"
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     WEB_PORT: ${EXT_PORT_FRONTEND_GIS}
-  #     API_GIS_URL: "localhost:${EXT_PORT_API_GIS}"
-  #   depends_on:
-  #     - api-gis
-
-  # # Container that runs the web interface for displaying the map
-  # frontend-proc:
-  #   container_name: frontend-proc
-  #   build: docker/images/web
-  #   volumes:
-  #     - ./src/frontend/proc:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_PORT_FRONTEND_PROC}:${EXT_PORT_FRONTEND_PROC}"
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     WEB_PORT: ${EXT_PORT_FRONTEND_PROC}
-  #     API_GRAPHQL_URL: "localhost:${EXT_PORT_API_GRAPHQL}"
-  #     API_PROC_URL: "localhost:${EXT_PORT_API_PROC}"
-  #   depends_on:
-  #     - api-proc
-  #     - api-graphql
-
-  # # Container that runs a golang exmaple
-  # golang-example:
-  #   container_name: golang-example
-  #   build: docker/images/golang
-  #   volumes:
-  #     - ./src/examples/golang:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-
-  # # Container that runs a elixir exmaple
-  # elixir-example:
-  #   container_name: elixir-example
-  #   build: docker/images/elixir
-  #   volumes:
-  #     - ./src/examples/elixir:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
 
   redis-borker:
     container_name: redis
