@@ -20,4 +20,4 @@ app.add_url_rule(
 )
 
 app.config["DEBUG"] = True
-app.run(host="0.0.0.0", port=PORT)
+app.run(host="0.0.0.0", port=int(Env.get_var("API_PORT")))
