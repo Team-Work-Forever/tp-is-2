@@ -95,7 +95,23 @@ services:
     env_file:
       - .env
     depends_on:
-      - db-xml
+      db-xml:
+        condition: service_healthy
+
+  # # Container that runs the API for entities
+  api-entities:
+    container_name: api-entities
+    build: docker/images/javascript
+    volumes:
+      - ./src/api/entities:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    ports:
+      - "${EXT_API_ENTITIES_PORT}:${API_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      db-rel:
+        condition: service_healthy
 
   # # Container that runs the web interface for displaying entities
   # frontend-ent:
@@ -146,20 +162,6 @@ services:
   #   depends_on:
   #     - api-proc
   #     - api-graphql
-
-  # # Container that runs the API for entities
-  # api-entities:
-  #   container_name: api-entities
-  #   build: docker/images/javascript
-  #   volumes:
-  #     - ./src/api/entities:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${EXT_API_ENTITIES_PORT}:${API_PORT}"
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     API_PORT: ${API_PORT}
-  #     DATABASE_URL: ${DATABASE_URL}
 
   # # Container that runs the API for gis
   # api-gis:
