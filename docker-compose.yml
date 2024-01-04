@@ -52,53 +52,50 @@ services:
       db-xml:
         condition: service_healthy
 
-  # # Container that automatically migrates data from db-xml to db-rel
-  # migrator:
-  #   container_name: migrator
-  #   build: docker/images/python
-  #   volumes:
-  #     - ./src/daemon/migrator:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     MIGRATOR_POLLING_FREQ: ${MIGRATOR_POLLING_FREQ}
-  #     MIGRATOR_API_URL: ${MIGRATOR_API_URL}
-  #   depends_on:
-  #     - db-xml
-  #     - db-rel
+  # watcher
 
   # # Container that automatically migrates data from db-xml to db-rel
-  # gis-updater:
-  #   container_name: gis-updater
-  #   build: docker/images/python
-  #   volumes:
-  #     - ./src/daemon/gis-updater:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     UPDATER_GIS_POLLING_FREQ: ${UPDATER_GIS_POLLING_FREQ}
-  #     UPDATER_GIS_API_GIS_URL: ${UPDATER_GIS_API_GIS_URL}
-  #     UPDATER_GIS_GIS_WAIT_FOR_API: ${UPDATER_GIS_GIS_WAIT_FOR_API}
-  #     UPDATER_GIS_NOMINATIM_WAIT_FOR_API: ${UPDATER_GIS_NOMINATIM_WAIT_FOR_API}
-  #     # ENTITIES_PER_ITERATION: ${ENTITIES_PER_ITERATION}
-  #   depends_on:
-  #     - api-gis
-  #     - api-entities
+  migrator:
+    container_name: migrator
+    build: docker/images/golang
+    volumes:
+      - ./src/daemon/migrator:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    env_file:
+      - .env
+    depends_on:
+      - db-xml
+      - db-rel
+
+  # # Container that automatically migrates data from db-xml to db-rel
+  gis-updater:
+    container_name: gis-updater
+    build: docker/images/python
+    volumes:
+      - ./src/daemon/gis-updater:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    env_file:
+      - .env
+    depends_on:
+      broker:
+        condition: service_healthy
+
+      # - api-gis
+      # - api-entities
 
   # # Container that runs the RPC server
-  # rpc-server:
-  #   container_name: rpc-server
-  #   build: docker/images/python
-  #   volumes:
-  #     - ./src/server/rpc:/usr/src/app
-  #     - ./docker/volumes/xml:/xml
-  #   ports:
-  #     - "${RPC_SERVER_PORT}:${RPC_SERVER_PORT}"
-  #   environment:
-  #     USE_DEV_MODE: ${USE_DEV_MODE}
-  #     RPC_SERVER_PORT: ${RPC_SERVER_PORT}
-  #   depends_on:
-  #     - db-xml
+  rpc-server:
+    container_name: rpc-server
+    build: docker/images/python
+    volumes:
+      - ./src/server/rpc:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    ports:
+      - "${RPC_SERVER_PORT}:${RPC_SERVER_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - db-xml
 
   # # Container that runs the web interface for displaying entities
   # frontend-ent:
