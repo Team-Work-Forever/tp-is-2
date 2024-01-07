@@ -51,6 +51,8 @@ services:
     depends_on:
       db-xml:
         condition: service_healthy
+      watcher:
+        condition: service_started
   
   # # Container that runs a elixir exmaple
   watcher:
@@ -62,8 +64,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - importer
-      - db-xml
+      db-xml:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
 
   # # Container that automatically migrates data from db-xml to db-rel
   migrator:
@@ -75,7 +79,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - watcher
+      watcher:
+        condition: service_started
+      api-entities:
+        condition: service_started
 
   # # Container that automatically migrates data from db-xml to db-rel
   gis-updater:
@@ -89,6 +96,8 @@ services:
     depends_on:
       broker:
         condition: service_healthy
+      api-gis:
+        condition: service_started
 
   # # Container that runs the RPC server
   rpc-server:
@@ -146,6 +155,9 @@ services:
       - "${EXT_API_PROC_PORT}:${API_PORT}"
     env_file:
       - .env
+    depends_on:
+      rpc-server:
+        condition: service_started
 
   # Container that runs the API for graphql
   api-graphql:
@@ -158,6 +170,9 @@ services:
       - "7322:${API_PORT}"
     env_file:
       - .env
+    depends_on:
+      db-rel:
+        condition: service_healthy
 
   redis-borker:
     container_name: redis
