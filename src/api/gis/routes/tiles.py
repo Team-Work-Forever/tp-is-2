@@ -42,4 +42,4 @@ def get_tiles():
     neLat, neLon, swLat, swLon = get_coordinates_from_query()
     response = mark_repository.get_selected_region(neLat, neLon, swLat, swLon)
 
-    return jsonify(response)
+    return jsonify(response[0][0])

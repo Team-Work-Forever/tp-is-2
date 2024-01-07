@@ -1,4 +1,5 @@
 from flask import Blueprint, Flask
+from flask_cors import CORS
 from errors.internal_error import HttpError
 from routes.error_handler import handle_all_exceptions, handle_value_error, handle_execution_error
 from .tiles import tiles
@@ -6,6 +7,7 @@ from .entities import entities
 
 app = Flask(__name__)
 app.json.sort_keys = False
+CORS(app)
 
 api = Blueprint('api', __name__, url_prefix="/api")
 
