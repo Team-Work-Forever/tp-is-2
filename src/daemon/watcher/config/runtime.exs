@@ -3,7 +3,7 @@ import Config
 
 source!([
   ".env",
-  System.get_env()
+  System.get_env(),
 ])
 
 config :watcher, Watcher.Services.Repo,
@@ -31,6 +31,7 @@ config :watcher, :rabbitmq,
   virtual_host: env!("RABBIT_MQ_VIRTUAL_HOST", :string!, "is"),
   exchange: env!("RABBIT_MQ_EXCHANGE", :string!, "watcher"),
   queues: [
+    {env!("RABBIT_MQ_QUEUE_ENTITIES", :string!, "entities"), env!("RABBIT_MQ_EXCHANGE", :string!, "watcher"), "create-entity"},
     {env!("RABBIT_MQ_QUEUE_ENTITIES", :string!, "entities"), env!("RABBIT_MQ_EXCHANGE", :string!, "watcher"), "create-country"},
     {env!("RABBIT_MQ_QUEUE_ENTITIES", :string!, "entities"), env!("RABBIT_MQ_EXCHANGE", :string!, "watcher"), "create-wine"},
     {env!("RABBIT_MQ_QUEUE_ENTITIES", :string!, "entities"), env!("RABBIT_MQ_EXCHANGE", :string!, "watcher"), "create-taster"},
