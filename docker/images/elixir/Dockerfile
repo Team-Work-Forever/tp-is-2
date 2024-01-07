@@ -2,8 +2,6 @@ FROM elixir:1.15.7-alpine
 
 WORKDIR /usr/src/app
 
-COPY ./src/deamon/watcher .
-
 # install bash
 RUN apk add bash
 
