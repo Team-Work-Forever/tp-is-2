@@ -22,7 +22,7 @@ func main() {
 	defer redis.Close()
 
 	// Connect RabbitMQ
-	rabbitqm, err := data.CreateRabbitMQ()
+	rabbitqm, err := data.GetRabbitMqConnection()
 
 	if err != nil {
 		log.Fatalf("Error connecting to RabbitMQ: %s", err.Error())
