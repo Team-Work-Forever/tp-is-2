@@ -1,20 +1,20 @@
 package cmd
 
 import (
-	"encoding/json"
+	"fmt"
 	"migrator/pkg/api"
-	"migrator/pkg/entities"
+	"migrator/pkg/xml_reader/entities"
 )
 
 type HandleCountryCommand struct {
 	Api *api.Api
 }
 
-func (c *HandleCountryCommand) Execute(entity []byte) error {
-	var country entities.Country
+func (c *HandleCountryCommand) Execute(entity interface{}) error {
+	country, ok := entity.(entities.Country)
 
-	if err := json.Unmarshal(entity, &country); err != nil {
-		return err
+	if !ok {
+		return fmt.Errorf("expected Country, got %T", entity)
 	}
 
 	// Check if Country exists, and retrive the Country Id

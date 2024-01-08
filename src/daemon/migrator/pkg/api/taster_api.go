@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"migrator/pkg/entities"
+	"migrator/pkg/xml_reader/entities"
 	"net/http"
 )
 
