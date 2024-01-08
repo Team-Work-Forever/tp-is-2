@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"encoding/json"
 	"migrator/pkg/api"
 	"migrator/pkg/entities"
 )
@@ -10,11 +10,11 @@ type HandleWineCommand struct {
 	Api *api.Api
 }
 
-func (c *HandleWineCommand) Execute(entity interface{}) error {
-	wine, ok := entity.(entities.Wine)
+func (c *HandleWineCommand) Execute(entity []byte) error {
+	var wine entities.Wine
 
-	if !ok {
-		return fmt.Errorf("expected wine, got %T", entity)
+	if err := json.Unmarshal(entity, &wine); err != nil {
+		return err
 	}
 
 	// Create wine

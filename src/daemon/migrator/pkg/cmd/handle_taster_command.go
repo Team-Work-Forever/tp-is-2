@@ -1,32 +1,24 @@
 package cmd
 
 import (
-	"encoding/json"
+	"fmt"
 	"migrator/pkg/api"
-	"migrator/pkg/entities"
+	"migrator/pkg/xml_reader/entities"
 )
 
 type HandleTasterCommand struct {
 	Api *api.Api
 }
 
-type TasterResponse struct {
-	Name          string `json:"name"`
-	TwitterHandle string `json:"twitter_handle"`
-}
+func (c *HandleTasterCommand) Execute(entity interface{}) error {
+	taster, ok := entity.(entities.Taster)
 
-func (c *HandleTasterCommand) Execute(entity []byte) error {
-	var taster TasterResponse
-
-	if err := json.Unmarshal(entity, &taster); err != nil {
-		return err
+	if !ok {
+		return fmt.Errorf("expected Taster, got %T", entity)
 	}
 
 	// Persist Taster, eventhough it is may exist
-	if err := c.Api.CreateTaster(&entities.Taster{
-		Name:          taster.Name,
-		TwitterHandle: taster.TwitterHandle,
-	}); err != nil {
+	if err := c.Api.CreateTaster(&taster); err != nil {
 		return err
 	}
 

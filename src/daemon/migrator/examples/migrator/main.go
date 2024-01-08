@@ -5,7 +5,6 @@ import (
 	"migrator/pkg/cmd"
 	"migrator/pkg/config"
 	"migrator/pkg/data"
-	"migrator/pkg/xml_reader"
 	"os"
 	"os/signal"
 	"syscall"
@@ -54,22 +53,16 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 				return
 			}
 
-			xmlValue := string(message.Body)
-			// xmlValue, err := redis.GetValue(redisId)
-
-			// if err != nil {
-			// 	log.Fatalf("Error getting value from Redis: %s", err.Error())
-			// }
-
-			xml_reader := xml_reader.NewXmlReader()
-			wineReviews, err := xml_reader.DecodeResponse(xmlValue)
+			if err != nil {
+				log.Fatalf("Error getting value from Redis: %s", err.Error())
+			}
 
 			if err != nil {
 				log.Fatalf("Error decoding XML: %s", err.Error())
 			}
 
 			// Execute command
-			executer.Handle(wineReviews)
+			executer.HandleV2(message.RoutingKey, message.Body)
 			log.Println("Migration successfully executed!")
 
 		case <-signalCh:
