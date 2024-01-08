@@ -1,5 +1,4 @@
 defmodule Watcher.Services.RabbitMQ do
-  require Poison
   alias AMQP.Connection
   alias AMQP.Channel
   alias AMQP.Queue
@@ -56,7 +55,7 @@ defmodule Watcher.Services.RabbitMQ do
     config = Application.fetch_env!(:watcher, :rabbitmq)
     exchange = Keyword.get(config, :exchange)
 
-    Basic.publish(channel, exchange, router_key, message) # Poison.encode!(message)
+    Basic.publish(channel, exchange, router_key, message)
   end
 
   @spec close_connection(AMQP.Channel.t()) :: :ok | {:error, {:error, :blocked | :closing}}

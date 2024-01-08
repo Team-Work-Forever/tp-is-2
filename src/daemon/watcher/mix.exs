@@ -24,7 +24,6 @@ defmodule Watcher.MixProject do
       {:postgrex, "~> 0.17.4"},
       {:amqp, "~> 3.3"},
       {:redix, "~> 1.3"},
-      {:poison, "~> 5.0"},
       {:dotenvy, "~> 0.8.0"},
     ]
   end
