@@ -2,12 +2,21 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"migrator/pkg/api"
+	"migrator/pkg/data"
 	"migrator/pkg/xml_reader/entities"
 )
 
 type HandleCountryCommand struct {
 	Api *api.Api
+}
+
+type UpdateGisRequest struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Country   string  `json:"country"`
+	Region    string  `json:"region"`
 }
 
 func (c *HandleCountryCommand) Execute(entity interface{}) error {
@@ -16,6 +25,9 @@ func (c *HandleCountryCommand) Execute(entity interface{}) error {
 	if !ok {
 		return fmt.Errorf("expected Country, got %T", entity)
 	}
+
+	// get rabbitmq connection
+	rabbimq, _ := data.GetRabbitMqConnection()
 
 	// Check if Country exists, and retrive the Country Id
 	existingCountry, err := c.Api.GetCountryIfExists(country.Name)
@@ -38,6 +50,21 @@ func (c *HandleCountryCommand) Execute(entity interface{}) error {
 	if err := c.Api.AddRegionsToCountry(&country); err != nil {
 		if _, ok := err.(api.AlreadyExistsError); !ok {
 			return err
+		}
+	}
+
+	// Publish to RabbitMQ
+	for _, region := range country.Regions {
+		if region.ShouldUpdateCoordinates() {
+			if err := rabbimq.PublishMessage(&UpdateGisRequest{
+				Latitude:  region.Latitude,
+				Longitude: region.Longitude,
+				Country:   country.Name,
+				Region:    region.Region,
+			}); err != nil {
+				log.Printf("Error publishing message to RabbitMQ: %s", err)
+				return err
+			}
 		}
 	}
 
