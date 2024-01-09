@@ -69,3 +69,63 @@ def map_to_wine(row):
         'updatedAt': row[7],
         'deletedAt': row[8]
     }
+
+def map_to_average(row):
+    if row is None:
+        return None
+
+    return {
+        'winery': row[0],
+        'average_points': row[1],
+    }
+
+def map_to_country_names(row):
+    if row is None:
+        return None
+
+    return row[0]
+
+def map_to_country_regions(row):
+    if row is None:
+        return None
+
+    return row[0]
+
+def map_to_number_tasters(row):
+    if row is None:
+        return None
+
+    return {
+        'taster': row[0],
+        'number_of_reviews': row[1],
+    }
+
+def map_to_country_wines(row):
+    if row is None:
+        return None
+
+    return {
+        'country': row[0],
+        'number_of_wines': row[1],
+    }
+
+def map_to_review_winery(row):
+    if row is None:
+        return None
+
+    return {
+        'winery': row[0],
+        'number_of_reviews': row[1],
+    }
+
+def map_to_most_expensive_wines(row):
+    if row is None:
+        return None
+
+    return {
+        'id': row[0],
+        'winery': row[1],
+        'designation': row[2],
+        'variety': row[3],
+        'price': row[4],
+    }
