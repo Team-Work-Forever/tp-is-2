@@ -10,14 +10,15 @@ class ProcRepository(BaseRepository):
     def fetch_average_points_per_wine(self, limit: int = 10, order: str = 'desc'):
         cursor = self._db_context.get_cursor()
 
-        cursor.execute("""
+        cursor.execute(f"""
             SELECT
                 wine.winery,
                 AVG(review.points) AS average_points
             FROM review
             INNER JOIN wine ON review.wine_id = wine.id
             GROUP BY wine.winery
-            ORDER BY average_points
+            ORDER BY average_points {order}
+            LIMIT {limit}
             """
         )
 

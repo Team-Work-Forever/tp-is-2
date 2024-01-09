@@ -1,4 +1,4 @@
-from graphene import ObjectType, Field, List, String
+from graphene import ObjectType, Field, List, String, Int
 
 from schema.queries.country_query import resolve_countries
 from schema.queries.proc_queries import resolve_countries as resolve_country_name, resolve_average_points, resolve_country_regions, resolve_most_expensive_wines, resolve_country_wines, resolve_number_review_by_taster, resolve_number_reviews_winery
@@ -20,7 +20,7 @@ class Query(ObjectType):
     tasters = Field(List(TasterType), resolver=resolve_tasters)
 
     # proc
-    average_points = Field(List(AveragePointsPerWineType), resolver=resolve_average_points)
+    average_points = Field(List(AveragePointsPerWineType), resolver=resolve_average_points, limit=Int(), order=String())
     country_names = List(String, resolver=resolve_country_name)
     country_regions = List(String, resolver=resolve_country_regions)
     country_wines = Field(List(CountryWineType), resolver=resolve_country_wines)
