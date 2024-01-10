@@ -37,12 +37,12 @@ def resolve_country_wines(root, info):
 def resolve_number_review_by_taster(root, info):
     return proc_repo.fetch_number_of_reviews_made_by_an_taster()
 
-def resolve_number_reviews_winery(root, info):
+def resolve_number_reviews_winery(root, info, limit, order):
     limit, order = validate_params(limit, order)
 
     return proc_repo.fetch_number_reviews_winery(limit=limit, order=order)
 
-def resolve_most_expensive_wines(root, info):
+def resolve_most_expensive_wines(root, info, limit, order):
     limit, order = validate_params(limit, order)
 
     return proc_repo.fetch_the_most_expensive_wines(limit=limit, order=order)

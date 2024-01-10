@@ -25,5 +25,5 @@ class Query(ObjectType):
     country_regions = List(String, resolver=resolve_country_regions)
     country_wines = Field(List(CountryWineType), resolver=resolve_country_wines)
     number_review_by_taster = Field(List(ReviewByTasterType), resolver=resolve_number_review_by_taster)
-    number_reviews_winery = Field(List(ReviewByWineryType), resolver=resolve_number_reviews_winery)
-    most_expensive_wines = Field(List(MostExpensiveType), resolver=resolve_most_expensive_wines)
+    number_reviews_winery = Field(List(ReviewByWineryType), resolver=resolve_number_reviews_winery, limit=Int(), order=String())
+    most_expensive_wines = Field(List(MostExpensiveType), resolver=resolve_most_expensive_wines, limit=Int(), order=String())
