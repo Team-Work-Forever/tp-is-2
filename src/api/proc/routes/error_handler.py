@@ -35,6 +35,9 @@ def handle_internal_server_error(error: Exception):
     message = str(error)
     status = HttpStatus.INTERNAL_SERVER_ERROR
 
+    import traceback
+    traceback.print_exc()
+
     return jsonify({
         'message': message,
         "status": status,
