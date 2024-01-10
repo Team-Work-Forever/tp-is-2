@@ -9,7 +9,6 @@ from services.rpc_connection import RPConnection
 
 
 xml = Blueprint('xml', __name__)
-rpc_client = RPConnection()
 
 def encode_file(data):
     return base64.b64encode(data).decode('utf-8')
@@ -41,7 +40,7 @@ def import_xml_file():
     file_content, file_name = get_file_content(type='csv')
     file_content = encode_file(file_content)
 
-    rpc_client.upload_file_to_xml(file_name, file_content)
+    RPConnection().upload_file_to_xml(file_name, file_content)
 
     return jsonify(toMessage("File was imported!")), HttpStatus.CREATED
 
@@ -49,7 +48,7 @@ def import_xml_file():
 # TODO: Would be nice to have more information about the files
 @xml.route('/files/uploaded', methods=['GET'])
 def get_all_uploaded_files():
-    response = rpc_client.get_all_persisted_files()
+    response = RPConnection().get_all_persisted_files()
         
     return jsonify(response), HttpStatus.OK
 
@@ -58,7 +57,7 @@ def get_all_uploaded_files():
 @xml.route('/files/uploaded/<file_name>', methods=['GET'])
 def get_information_about_file(file_name: str):
     validate_param(file_name, "file_name", "dataset.csv")
-    response = rpc_client.get_file_info(file_name)
+    response = RPConnection().get_file_info(file_name)
 
     return jsonify(toFileDto(response)), HttpStatus.OK
 
@@ -67,7 +66,7 @@ def get_information_about_file(file_name: str):
 @xml.route('/files/uploaded/<file_name>', methods=['DELETE'])
 def remove_uploaded_file(file_name: str):
     validate_param(file_name, "file_name", "dataset.csv")
-    response = rpc_client.remove_record(file_name)
+    response = RPConnection().remove_record(file_name)
 
     return jsonify(toMessage(response)), HttpStatus.ACCEPTED
 
@@ -75,6 +74,6 @@ def remove_uploaded_file(file_name: str):
 @xml.route('/files/uploaded/validate', methods=['POST'])
 def validate_xml_file():
     file_content, _ = get_file_content(type='xml')
-    response = rpc_client.validate_xml_file(file_content)
+    response = RPConnection().validate_xml_file(file_content)
 
     return jsonify(toMessage(response)), HttpStatus.ACCEPTED

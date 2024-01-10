@@ -3,7 +3,7 @@ from xmlrpc.client import ServerProxy
 from helpers import SingletonMeta
 from utils import Env
 
-class RPConnection(metaclass=SingletonMeta):
+class RPConnection():
     def __init__(self) -> None:
         self._connect()
 
@@ -13,6 +13,7 @@ class RPConnection(metaclass=SingletonMeta):
 
         try:
             self._connection = ServerProxy(f'http://{host}:{port}')
+            print(f'Connected to RPC Server at {host}:{port}')
         except:
             raise Exception('Could not connect to RPC Server')
 

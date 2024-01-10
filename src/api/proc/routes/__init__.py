@@ -1,6 +1,7 @@
 import xmlrpc.client
 
 from flask import Flask
+from flask_cors import CORS
 from errors.internal_error import HttpError
 from routes.error_handler import handle_all_exceptions, handle_rpc_exceptions, handle_value_errors, handle_internal_server_error
 from routes.query import query
@@ -8,6 +9,7 @@ from routes.xml import xml
 
 app = Flask(__name__)
 app.json.sort_keys = False
+CORS(app)
 
 app.errorhandler(HttpError)(handle_all_exceptions)
 app.errorhandler(ValueError)(handle_value_errors)
