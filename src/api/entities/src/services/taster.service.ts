@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { NotFoundError } from 'errors/not-found.error';
-import { UniqueConstraintError } from 'errors/unique-contraint.error';
+import { NotFoundError } from 'src/errors/not-found.error';
+import { UniqueConstraintError } from 'src/errors/unique-contraint.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapReviewToDto } from 'src/mappers/review.mapper';
 import { mapTasterToDto } from 'src/mappers/taster.mapper';
 import { ReviewService } from './review.service';
-import { ConflitError } from 'errors/confilt.error';
+import { ConflitError } from 'src/errors/confilt.error';
 import { UpdateTasterRequest } from 'src/contracts/taster.requests';
-import { BadRequestError } from 'errors/bad-request.error';
+import { BadRequestError } from 'src/errors/bad-request.error';
 
 type UpdateTaster = UpdateTasterRequest & {
     tasterId: string

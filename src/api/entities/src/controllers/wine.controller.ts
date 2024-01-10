@@ -40,8 +40,22 @@ export class WineController {
     @Get()
     public async getWines(
         @Query("title") title: string,
+        @Query("page") page: string,
+        @Query("pageSize") pageSize: string,
+        @Query("gt_price") gt_price: string,
+        @Query("lt_price") lt_price: string,
+        @Query("eq_price") eq_price: string,
+        @Query("order") order: string,
         @Res() response: Response): Promise<Response<WineDto[]>> {
-        const wines = await this.wineService.findAll(title);
+        const wines = await this.wineService.findAll({
+            title,
+            order: order, 
+            gt_price: gt_price,
+            lt_price: lt_price,
+            eq_price: eq_price,
+            page: parseInt(page),
+            pageSize: parseInt(pageSize),
+        });
 
         return response
             .status(200).send(wines);

@@ -3,12 +3,13 @@ import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapReviewToDto } from '../mappers/review.mapper';
 import { mapWineToDto } from 'src/mappers/wine.mapper';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
-import { NotFoundError } from 'errors/not-found.error';
+import { NotFoundError } from 'src/errors/not-found.error';
 import { Prisma } from '@prisma/client';
-import { UniqueConstraintError } from 'errors/unique-contraint.error';
+import { UniqueConstraintError } from 'src/errors/unique-contraint.error';
 import { ReviewService } from './review.service';
-import { ConflitError } from 'errors/confilt.error';
+import { ConflitError } from 'src/errors/confilt.error';
 import { CreateWineRequest } from 'src/contracts/wine.requests';
+import { BadRequestError } from 'src/errors/bad-request.error';
 
 type CreateWine = CreateWineRequest;
 type UpdateWine = CreateWineRequest & {
@@ -65,13 +66,33 @@ export class WineService {
         return mapWineToDto(wine);
     }
 
-    async findAll(title?: string) {
+    async findAll({
+        title,
+        gt_price,
+        lt_price,
+        eq_price,
+        order = 'asc',
+        page = 1,
+        pageSize = 10
+    }) {
+        if (order !== 'asc' && order !== 'desc') {
+            throw new BadRequestError(`Order must be either asc or desc`);
+        }
+
         const wines = await this.prisma.wine.findMany({
             where: {
                 title: {
                     equals: title,
-                }
-            }, include: { region: true }
+                },
+                price: {
+                    gt: gt_price && parseInt(gt_price),
+                    lt: lt_price && parseInt(lt_price),
+                    equals: eq_price && parseInt(eq_price),
+                },
+            },
+            skip: (page - 1) * pageSize || 0,
+            take: pageSize || 10,
+            include: { region: true }
         });
 
         return wines.map(

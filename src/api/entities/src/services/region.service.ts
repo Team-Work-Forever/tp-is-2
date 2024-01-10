@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { NotFoundError } from 'errors/not-found.error';
+import { NotFoundError } from 'src/errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { mapRegionDaoToDto, mapRegionToDto } from 'src/mappers/region.mapper';
 import { CountryService } from './country.service';
 import { CreateRegionRequest, UpdateRegionRequest } from 'src/contracts/region.requests';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
-import { ConflitError } from 'errors/confilt.error';
+import { ConflitError } from 'src/errors/confilt.error';
 import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from '@prisma/client/runtime/library';
+import { BadRequestError } from 'src/errors/bad-request.error';
 
 type CreateRegion = {
     request: CreateRegionRequest;
@@ -66,7 +67,9 @@ export class RegionService {
         return mapRegionDaoToDto(region);
     }
 
-    async findAll(countryId: string) {
+    async findAll(
+        countryId: string,
+    ) {
         const extendedPrisma = this.prisma.$extends(createRegionExtension);
         await this.countryService.findCountryById(countryId);
 
