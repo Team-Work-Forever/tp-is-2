@@ -10,9 +10,11 @@ import { ReviewController } from './controllers/review.controller';
 import { ReviewService } from './services/review.service';
 import { RegionController } from './controllers/region.controller';
 import { RegionService } from './services/region.service';
+import { CheckController } from './controllers/check.controller';
 
 @Module({
   controllers: [
+    CheckController,
     CountryController,
     TasterController,
     WineController,

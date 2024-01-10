@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { BadRequestError } from 'errors/bad-request.error';
-import { NotFoundError } from 'errors/not-found.error';
+import { BadRequestError } from 'src/errors/bad-request.error';
+import { NotFoundError } from 'src/errors/not-found.error';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { ReviewDto } from 'src/contracts/dtos/review.dto';
 import { UpdateReviewRequest } from 'src/contracts/review.requests';
@@ -172,8 +172,28 @@ export class ReviewService {
         return mapReviewToDto(review);
     }
 
-    async findAll() {
+    async findAll({
+        gt_points,
+        lt_points,
+        eq_points,
+        order = 'asc',
+        page = 1,
+        pageSize = 10,
+    }) {
+        if (order !== 'asc' && order !== 'desc') {
+            throw new BadRequestError(`Order must be either asc or desc`);
+        }
+
         const reviews = await this.prisma.review.findMany({
+            where: {
+                points: {
+                    gt: gt_points && parseInt(gt_points),
+                    lt: lt_points && parseInt(lt_points),
+                    equals: eq_points && parseInt(eq_points),
+                },
+            },
+            skip: (page - 1) * pageSize || 0,
+            take: pageSize || 10,
             include: {
                 taster: true,
                 wine: true,

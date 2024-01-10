@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { CreateRegionRequest, regionSchemaArray, updateRegionSchema } from 'src/contracts/region.requests';
 import { UuidPipe } from 'src/pipes/uuid.pipe';
@@ -36,8 +36,13 @@ export class RegionController {
     }
 
     @Get()
-    public async getAllRegions(@Param("countryId", new UuidPipe()) { id: countryId }, @Res() response: Response) {
-        const regions = await this.regionService.findAll(countryId);
+    public async getAllRegions(
+        @Param("countryId", new UuidPipe()) { id: countryId },
+        @Res() response: Response) {
+        const regions = 
+            await this.regionService.findAll(
+                countryId
+            );
 
         return response.status(200).json(regions);
     }

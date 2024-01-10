@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { ConflitError } from 'errors/confilt.error';
-import { NotFoundError } from 'errors/not-found.error';
-import { UniqueConstraintError } from 'errors/unique-contraint.error';
+import { ConflitError } from 'src/errors/confilt.error';
+import { NotFoundError } from 'src/errors/not-found.error';
+import { UniqueConstraintError } from 'src/errors/unique-contraint.error';
 import createRegionExtension from 'src/config/prisma/extensions/create-region.extension';
 import { PrismaService } from 'src/config/prisma/prisma.service';
 import { CreateCountryRequest } from 'src/contracts/country.requests';
