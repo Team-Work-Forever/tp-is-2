@@ -1,4 +1,5 @@
 import signal, sys
+import socketserver
 
 from helpers import Env
 
@@ -21,9 +22,13 @@ dbAccess = DbConnection()
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
+class RPCThreading(socketserver.ThreadingMixIn, SimpleXMLRPCServer):
+    pass
+
+
 register_methods = load_handlers_by_assembly()
 
-with SimpleXMLRPCServer(('0.0.0.0', 9000), requestHandler=RequestHandler) as server:
+with RPCThreading(('0.0.0.0', 9000), requestHandler=RequestHandler) as server:
     server.register_introspection_functions()
 
     def signal_handler(signum, frame):

@@ -14,7 +14,8 @@ class GetCountryRegions(Handler):
 
         try:
             query = f"""
-                select 
+                select
+                    distinct
                     unnest(xpath('/WineReviews/Countries/Country[@name="{country}"]/Region/@region', xml))::text as Regions
                 from public.active_imported_documents;
             """

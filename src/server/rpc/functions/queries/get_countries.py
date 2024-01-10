@@ -15,6 +15,7 @@ class GetCountries(Handler):
         try:
             query = f"""
                 select
+                    distinct
                     unnest(xpath('/WineReviews/Countries/Country[count(*) > 0]/@name', xml))::text as country
                 from public.active_imported_documents;
             """
