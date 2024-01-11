@@ -8,7 +8,7 @@ export const wineSchema = z
         price: numberValidator("Price"),
         designation: textValidator("Designation"),
         variety: nameValidator("Variety"),
-        winery: nameValidator("Winery"),
+        winery: z.string(),
         region: nameValidator("Region"),
         title: textValidator("Title"),
     })
