@@ -16,9 +16,9 @@ export default function ReviewsPage() {
         "CreatedAt",
     ]
 
-    useEffect(() => {
+    function fetchData(page) {
         setLoading(true);
-        api.get('/reviews')
+        api.get(`/reviews?page=${page}&pageSize=10`)
             .then(response => {
                 setReviews(response.data.map(review => ({
                     id: review.id,
@@ -34,13 +34,15 @@ export default function ReviewsPage() {
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }
 
     return (
         <main>
              <ShowDataTable 
                 isLoading={isLoading} 
-                content={{rows: reviews, columns: reviewHeaders}} />
+                content={{rows: reviews, columns: reviewHeaders}} 
+                onSelectionChanged={(page) => fetchData(page)}
+                />
         </main>
     );
 }

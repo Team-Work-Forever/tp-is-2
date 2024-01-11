@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 
+import Pagination from '@mui/material/Pagination';
 import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -16,8 +17,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Close from '@mui/icons-material/Close';
 
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
@@ -108,7 +107,16 @@ function Row(props) {
   );
 }
 
-export default function ShowDataTable({ isLoading, content, aux }) {
+export default function ShowDataTable({ isLoading, content, aux, onSelectionChanged }) {
+  const hasPagination = onSelectionChanged !== undefined;
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    if (onSelectionChanged) {
+      onSelectionChanged(page);
+    }
+  }, [page]);
+
   const { columns, rows: data } = content
   const { rows: auxRows, title, errorMessage } = aux ?? {}
 
@@ -132,6 +140,10 @@ export default function ShowDataTable({ isLoading, content, aux }) {
 
   return (
     <>
+      {
+        hasPagination &&
+        <Pagination style={{ marginBottom: 10 }} count={10} page={page} onChange={(_, value) => { setPage(value); }} />
+      }
       {
         isLoading ?
           <Box sx={{ width: '100%' }}>

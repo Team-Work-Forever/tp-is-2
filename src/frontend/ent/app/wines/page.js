@@ -1,8 +1,7 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import api from "@/services/api";
-import ShowInformation from "@/components/ShowInformation";
 import ShowDataTable from "@/components/MediaCard";
 
 export default function TastersPage() {
@@ -27,9 +26,10 @@ export default function TastersPage() {
         "UpdatedAt",
     ]
 
-    useEffect(() => {
+    function fetchData(page) {
+        console.log(page);
         setLoading(true);
-        api.get('/wines')
+        api.get(`/wines?page=${page}&pageSize=10`)
             .then(response => {
                 console.log(response.data);
                 setWines(response.data.map(wine => ({
@@ -47,14 +47,17 @@ export default function TastersPage() {
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }
 
     return (
         <main>
             <ShowDataTable 
-                isLoading={isLoading} 
-                content={{rows: wines, columns: wineHeaders}} 
-                aux={{ rows: reviewHeaders, title: "Reviews", errorMessage: "There is no Review of this Wine" }} />
+                    isLoading={isLoading} 
+                    content={{rows: wines, columns: wineHeaders}} 
+                    aux={{ rows: reviewHeaders, title: "Reviews", errorMessage: "There is no Review of this Wine" }}
+                    onSelectionChanged={(page) => fetchData(page)}
+                    />
         </main>
+                    
     );
 }
