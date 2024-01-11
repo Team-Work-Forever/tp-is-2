@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState } from "react";
 import api from "@/services/api";
 import ShowDataTable from "@/components/MediaCard";
 
@@ -26,27 +26,23 @@ export default function TastersPage() {
         "UpdatedAt",
     ]
 
-    function fetchData(page) {
-        console.log(page);
+    async function fetchData(page) {
         setLoading(true);
-        api.get(`/wines?page=${page}&pageSize=10`)
-            .then(response => {
-                console.log(response.data);
-                setWines(response.data.map(wine => ({
-                    price: wine.price,
-                    region: wine.region, 
-                    title: wine.title, 
-                    variety: wine.variety,
-                    winery: wine.winery, 
-                    updatedAt: wine.updatedAt,
-                })));
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+
+        const response = await api.get(`/wines?page=${page}&pageSize=10`)
+            
+        setWines(response.data.data.map(wine => ({
+            price: wine.price,
+            region: wine.region, 
+            title: wine.title, 
+            variety: wine.variety,
+            winery: wine.winery, 
+            updatedAt: wine.updatedAt,
+        })));
+
+        setLoading(false);
+
+        return response.data.totalPages;
     }
 
     return (
