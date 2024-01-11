@@ -16,24 +16,20 @@ export default function ReviewsPage() {
         "CreatedAt",
     ]
 
-    function fetchData(page) {
+    async function fetchData(page) {
         setLoading(true);
-        api.get(`/reviews?page=${page}&pageSize=10`)
-            .then(response => {
-                setReviews(response.data.map(review => ({
-                    id: review.id,
-                    points: review.points,
-                    description: review.description,
-                    twitterHandle: review.twitterHandle,
-                    createdAt: review.createdAt,
-                })));
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        const response = await api.get(`/reviews?page=${page}&pageSize=10`)
+
+        setReviews(response.data.data.map(review => ({
+            id: review.id,
+            points: review.points,
+            description: review.description,
+            twitterHandle: review.twitterHandle,
+            createdAt: review.createdAt,
+        })));
+
+        setLoading(false);
+        return response.data.totalPages;
     }
 
     return (

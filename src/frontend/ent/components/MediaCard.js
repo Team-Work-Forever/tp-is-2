@@ -110,10 +110,14 @@ function Row(props) {
 export default function ShowDataTable({ isLoading, content, aux, onSelectionChanged }) {
   const hasPagination = onSelectionChanged !== undefined;
   const [page, setPage] = useState(1);
+  const [count, setCount] = useState(1);
 
   useEffect(() => {
     if (onSelectionChanged) {
-      onSelectionChanged(page);
+      onSelectionChanged(page)
+        .then(totalPages => {
+          setCount(totalPages);
+        });
     }
   }, [page]);
 
@@ -142,7 +146,7 @@ export default function ShowDataTable({ isLoading, content, aux, onSelectionChan
     <>
       {
         hasPagination &&
-        <Pagination style={{ marginBottom: 10 }} count={10} page={page} onChange={(_, value) => { setPage(value); }} />
+        <Pagination style={{ marginBottom: 10 }} count={count} page={page} onChange={(_, value) => { setPage(value); }} />
       }
       {
         isLoading ?
