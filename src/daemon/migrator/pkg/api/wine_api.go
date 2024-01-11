@@ -8,23 +8,27 @@ import (
 )
 
 type WineResponse struct {
-	Id string `json:"id"`
+	Data []struct {
+		Id string `json:"id"`
+	} `json:"data"`
 }
 
-func (api *Api) GetWineIfExists(title string) (*WineResponse, error) {
-	var wineId []WineResponse
+func (api *Api) GetWineIfExists(title string) (*entities.Wine, error) {
+	var response WineResponse
 
-	err := api.get(fmt.Sprintf("wines?title=%s", url.QueryEscape(title)), &wineId)
+	err := api.get(fmt.Sprintf("wines?title=%s", url.QueryEscape(title)), &response)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if len(wineId) == 0 {
+	if len(response.Data) == 0 {
 		return nil, NotFoundError{fmt.Sprintf("Wine %s not found", title)}
 	}
 
-	return &wineId[0], nil
+	return &entities.Wine{
+		Id: response.Data[0].Id,
+	}, nil
 }
 
 func (api *Api) CreateWine(wine *entities.Wine) error {

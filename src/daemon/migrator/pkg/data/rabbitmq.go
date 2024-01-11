@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"migrator/pkg/config"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -40,14 +41,27 @@ func GetRabbitMqConnection() (*RabbitMQConnection, error) {
 	}, nil
 }
 
-func (rc *RabbitMQConnection) ConsumeMessages() (<-chan amqp.Delivery, *amqp.Channel, error) {
+func (rc *RabbitMQConnection) ConsumeMessages(consumer string) (<-chan amqp.Delivery, *amqp.Channel, error) {
 	channel, err := rc.rabbitmq.Channel()
 
 	if err != nil {
 		return nil, channel, err
 	}
 
-	messages, err := channel.Consume(rc.config.RABBIT_MQ_QUEUE_ENTITIES, "", true, false, false, false, nil)
+	channel.Qos(
+		1,
+		0,
+		false,
+	)
+
+	messages, err := channel.Consume(
+		rc.config.RABBIT_MQ_QUEUE_ENTITIES,
+		fmt.Sprintf("consumer-%s", consumer),
+		true,
+		false,
+		false,
+		false,
+		nil)
 
 	if err != nil {
 		return nil, nil, err
