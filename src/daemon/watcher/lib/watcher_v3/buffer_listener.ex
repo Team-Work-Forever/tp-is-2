@@ -50,7 +50,9 @@ defmodule WatcherV3.BufferListener do
     {:reply, {new_buffer, state.buffer}, state}
   end
 
+  # Handle notifications from Postgres
   def handle_info({:notification, _pid, _ref, _channel, message}, state) do
+
     # Add message to buffer
     updated_buffer = state.buffer ++ [message]
     update_state = %State{buffer: updated_buffer}

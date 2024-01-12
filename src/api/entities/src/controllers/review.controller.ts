@@ -17,7 +17,7 @@ export class ReviewController {
         @Query("eq_points") eq_points: string,
         @Query("order") order: string,
         @Res() response: Response): Promise<Response<any>> {
-        const reviews = await this.reviewService.findAll({
+        const { reviews, total } = await this.reviewService.findAll({
             order: order, 
             gt_points: gt_points,
             lt_points: lt_points,
@@ -27,7 +27,14 @@ export class ReviewController {
         });
 
         return response
-            .status(200).send(reviews);
+            .status(200).send(
+                {
+                    data: reviews,
+                    page: page,
+                    pageSize: pageSize,
+                    totalPages: Math.ceil(total / parseInt(pageSize)),
+                }
+            );
     }
 
 }

@@ -184,6 +184,16 @@ export class ReviewService {
             throw new BadRequestError(`Order must be either asc or desc`);
         }
 
+        const totalReviews = await this.prisma.review.count({
+            where: {
+                points: {
+                    gt: gt_points && parseInt(gt_points),
+                    lt: lt_points && parseInt(lt_points),
+                    equals: eq_points && parseInt(eq_points),
+                },
+            },
+        });
+
         const reviews = await this.prisma.review.findMany({
             where: {
                 points: {
@@ -200,6 +210,9 @@ export class ReviewService {
             }
         });
 
-        return reviews.map(review => mapReviewToDto(review));
+        return {
+            reviews: reviews.map(review => mapReviewToDto(review)),
+            total: totalReviews
+        }
     }
 }

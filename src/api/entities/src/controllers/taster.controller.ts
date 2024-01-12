@@ -87,7 +87,13 @@ export class TasterController {
         });
 
         return response
-            .status(200).send(reviews);
+            .status(200).send(
+                {
+                    data: reviews,
+                    page: page,
+                    pageSize: pageSize,
+                }
+            );
     }
 
     @Get(':tasterId/reviews/:reviewId')

@@ -79,6 +79,14 @@ export class WineService {
             throw new BadRequestError(`Order must be either asc or desc`);
         }
 
+        const totalWines = await this.prisma.wine.count({
+            where: {
+              title: {
+                equals: title,
+              },
+            },
+          });
+
         const wines = await this.prisma.wine.findMany({
             where: {
                 title: {
@@ -95,8 +103,11 @@ export class WineService {
             include: { region: true }
         });
 
-        return wines.map(
-            wine => mapWineToDto(wine));
+        return {
+            wines: wines.map(
+                wine => mapWineToDto(wine)),
+            total: totalWines
+        }
     }
 
     async create({ price, designation, variety, winery, title, region }: CreateWine) {
