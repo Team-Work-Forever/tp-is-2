@@ -37,3 +37,4 @@ graphql-server-core==1.2.0
 promise==2.3
 Rx==1.6.3
 six==1.16.0
+Flask-Cors==4.0.0

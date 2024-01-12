@@ -2,6 +2,8 @@ FROM golang:1.21.5-alpine3.19
 
 WORKDIR /usr/src/app
 
+COPY ./src/daemon/migrator/ ./
+
 # install bash
 RUN apk add bash
 

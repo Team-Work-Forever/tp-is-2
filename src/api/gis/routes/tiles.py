@@ -40,6 +40,9 @@ def get_coordinates_from_query():
 @tiles.route("/")
 def get_tiles():
     neLat, neLon, swLat, swLon = get_coordinates_from_query()
-    response = mark_repository.get_selected_region(neLat, neLon, swLat, swLon)
+    response = mark_repository.get_selected_region(neLat, neLon, swLat, swLon)[0][0]
 
-    return jsonify(response[0][0])
+    if response['features'] is None:
+        response['features'] = []
+        
+    return jsonify(response)

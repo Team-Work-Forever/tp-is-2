@@ -38,7 +38,7 @@ services:
       timeout: 5s
       retries: 15
 
-  # # Container that automatically converts CSV to XML and then imports the XML to db-xml
+  # # # Container that automatically converts CSV to XML and then imports the XML to db-xml
   importer:
     container_name: importer
     build: docker/images/python
@@ -53,14 +53,18 @@ services:
         condition: service_healthy
       watcher:
         condition: service_started
+      redis-broker:
+        condition: service_started
   
-  # # Container that runs a elixir exmaple
+  # # # Container that runs a elixir exmaple
   watcher:
     container_name: watcher
-    build: docker/images/elixir
+    build: 
+      context: .
+      dockerfile: docker/images/elixir/Dockerfile
     volumes:
       - ./src/daemon/watcher:/usr/src/app
-      - ./docker/volumes/xml:/xml
+      # - ./docker/volumes/xml:/xml
     env_file:
       - .env
     depends_on:
@@ -68,11 +72,15 @@ services:
         condition: service_healthy
       broker:
         condition: service_healthy
+      redis-broker:
+        condition: service_started
 
-  # # Container that automatically migrates data from db-xml to db-rel
+  # # # Container that automatically migrates data from db-xml to db-rel
   migrator:
     container_name: migrator
-    build: docker/images/golang
+    build: 
+      context: .
+      dockerfile: docker/images/golang/Dockerfile
     volumes:
       - ./src/daemon/migrator:/usr/src/app
       - ./docker/volumes/xml:/xml
@@ -82,9 +90,41 @@ services:
       watcher:
         condition: service_started
       api-entities:
-        condition: service_started
+        condition: service_healthy
 
-  # # Container that automatically migrates data from db-xml to db-rel
+  migrator1:
+    container_name: migrator1
+    build: 
+      context: .
+      dockerfile: docker/images/golang/Dockerfile
+    volumes:
+      - ./src/daemon/migrator:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    env_file:
+      - .env
+    depends_on:
+      watcher:
+        condition: service_started
+      api-entities:
+        condition: service_healthy
+
+  migrator2:
+    container_name: migrator2
+    build: 
+      context: .
+      dockerfile: docker/images/golang/Dockerfile
+    volumes:
+      - ./src/daemon/migrator:/usr/src/app
+      - ./docker/volumes/xml:/xml
+    env_file:
+      - .env
+    depends_on:
+      watcher:
+        condition: service_started
+      api-entities:
+        condition: service_healthy
+
+  # # # Container that automatically migrates data from db-xml to db-rel
   gis-updater:
     container_name: gis-updater
     build: docker/images/python
@@ -99,7 +139,7 @@ services:
       api-gis:
         condition: service_started
 
-  # # Container that runs the RPC server
+  # # # Container that runs the RPC server
   rpc-server:
     container_name: rpc-server
     build: docker/images/python
@@ -114,13 +154,14 @@ services:
       db-xml:
         condition: service_healthy
 
-  # # Container that runs the API for entities
+  # # # Container that runs the API for entities
   api-entities:
     container_name: api-entities
-    build: docker/images/javascript
-    volumes:
-      - ./src/api/entities:/usr/src/app
-      - ./docker/volumes/xml:/xml
+    build: 
+      context: .
+      dockerfile: docker/images/javascript/Dockerfile
+    # volumes:
+    #   - ./src/api/entities:/usr/src/app
     ports:
       - "${EXT_API_ENTITIES_PORT}:${API_PORT}"
     env_file:
@@ -128,8 +169,13 @@ services:
     depends_on:
       db-rel:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
-  # # Container that runs the API for gis
+  # # # Container that runs the API for gis
   api-gis:
     container_name: api-gis
     build: docker/images/python
@@ -144,7 +190,7 @@ services:
       db-rel:
         condition: service_healthy
     
-    # # Container that runs the API for procedures
+  #   # # Container that runs the API for procedures
   api-proc:
     container_name: api-proc
     build: docker/images/python
@@ -159,7 +205,7 @@ services:
       rpc-server:
         condition: service_started
 
-  # Container that runs the API for graphql
+  # # Container that runs the API for graphql
   api-graphql:
     container_name: api-graphql
     build: docker/images/python
@@ -174,7 +220,19 @@ services:
       db-rel:
         condition: service_healthy
 
-  redis-borker:
+  frontend-gis:
+    container_name: frontend-gis
+    build: docker/images/web
+    volumes:
+      - ./src/frontend/gis:/usr/src/app
+    ports:
+      - "${EXT_PORT_FRONTEND_ENT}:3000"
+    env_file:
+      - .env
+    depends_on:
+      - api-gis
+
+  redis-broker:
     container_name: redis
     image: redis/redis-stack:latest
     ports:

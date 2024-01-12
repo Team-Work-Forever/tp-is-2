@@ -7,7 +7,7 @@ from helpers import Env
 class NominatimApi(Api):
     def __init__(self):
         super().__init__("https://nominatim.openstreetmap.org")
-        self.waiting_time = int(Env.get_var("NOMINATIM_WAIT_FOR_API"))
+        self.waiting_time = int(Env.get_var("UPDATER_GIS_NOMINATIM_WAIT_FOR_API"))
 
     async def get_value(self, country: str, region: str) -> (float, float):
         try:

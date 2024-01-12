@@ -27,7 +27,8 @@ function ObjectMarkersGroup() {
 
         try {
             response = await apiGis
-            .get(`/tile?neLat=${ne.lat}&swLat=${sw.lat}&neLon=${ne.lng}&swLon=${sw.lng}`)
+                .get(`/tile?neLat=${ne.lat}&swLat=${sw.lat}&neLon=${ne.lng}&swLon=${sw.lng}`)
+            console.log(response);
 
         } catch (error) {
             console.error(error);

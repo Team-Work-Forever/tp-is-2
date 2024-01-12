@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Box, CircularProgress, Container, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 
 import apiProc from "../services/api";
+import apiGraphQl from "../services/graphql";
 
 import DisplayTable from "../Components/DisplayTable";
 
@@ -16,7 +17,6 @@ export default function GetCountryRegions() {
         const fetchData = async () => {
             if (selectedCountry) {
                 const response = await apiProc.get(`/countries/${selectedCountry}`);
-                console.log(response.data);
 
                 setProcData(response.data);
             }
@@ -32,11 +32,24 @@ export default function GetCountryRegions() {
             setCountries(response.data);
         }
 
+        const fetchDataGraph = async () => {
+            const response = await apiGraphQl.post("/graphql", {
+                query: `
+                    {
+                        countryRegions
+                    }
+                `
+            });
+            
+            setGQLData(response.data.data);
+        }
+
         fetchData();
+        fetchDataGraph();
     }, []);
 
     function displayData(loading, data) {
-        return procData ?
+        return !loading ?
         <DisplayTable headers={["Regions"]} data={data} />
         :
         <CircularProgress />
@@ -78,11 +91,11 @@ export default function GetCountryRegions() {
             }}>
                 <h2>Results <small>(PROC)</small></h2>
                 {
-                    displayData(procData != null, procData)
+                    displayData(procData !== undefined, procData)
                 }
                 <h2>Results <small>(GraphQL)</small></h2>
                 {
-                    // displayData(isLoadingGraph, graphQl?.averagePoints)
+                    // displayData(gqlData?.countryRegions !== undefined, gqlData?.countryRegions)
                 }
             </Container>
         </>

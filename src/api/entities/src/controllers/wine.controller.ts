@@ -47,7 +47,7 @@ export class WineController {
         @Query("eq_price") eq_price: string,
         @Query("order") order: string,
         @Res() response: Response): Promise<Response<WineDto[]>> {
-        const wines = await this.wineService.findAll({
+        const { wines, total } = await this.wineService.findAll({
             title,
             order: order, 
             gt_price: gt_price,
@@ -58,7 +58,14 @@ export class WineController {
         });
 
         return response
-            .status(200).send(wines);
+            .status(200).send(
+                {
+                    data: wines,
+                    page: page,
+                    pageSize: pageSize,
+                    totalPages: Math.ceil(total / parseInt(pageSize)),
+                }
+            );
     }
 
     @Get(":wineId")
@@ -98,7 +105,13 @@ export class WineController {
             pageSize: parseInt(pageSize),
         });
 
-        return response.status(HttpStatus.OK).json(reviews);
+        return response.status(HttpStatus.OK).json(
+            {
+                data: reviews,
+                page: page,
+                pageSize: pageSize,
+            }
+        );
     }
 
     @Get(':wineId/reviews/:reviewId')

@@ -18,17 +18,17 @@ class MarkRepository():
                     'features', jsonb_agg(
                         jsonb_build_object(
                             'type', 'Feature',
-                            'id', r.id,
+                            'id', w.id,
                             'geometry', st_asgeojson(r.coordinates)::jsonb,
-                            'properties', to_jsonb(r) - 'id' - 'coordinates' - 'deleted_at' - 'country_id' || jsonb_build_object('country_name', c.name)
+                            'properties', to_jsonb(w) - 'id' - 'region_id' - 'deleted_at' || jsonb_build_object('region', r.name)
                         )
                     )
                 ) AS geojson
             FROM
                 region r
-            INNER JOIN
-                country c ON r.country_id = c.id
-            """ + where_statement + """
+            INNER JOIN 
+                wine w ON r.id = w.region_id
+            """ + where_statement + """ and r.coordinates is not null
         """, (neLat, neLon, swLat, swLon,))
 
         return cursor.fetchall()
