@@ -22,7 +22,7 @@ class Query(ObjectType):
     # proc
     average_points = Field(List(AveragePointsPerWineType), resolver=resolve_average_points, limit=Int(), order=String())
     country_names = List(String, resolver=resolve_country_name)
-    country_regions = List(String, resolver=resolve_country_regions)
+    country_regions = List(String, resolver=resolve_country_regions, country=String())
     country_wines = Field(List(CountryWineType), resolver=resolve_country_wines)
     number_review_by_taster = Field(List(ReviewByTasterType), resolver=resolve_number_review_by_taster)
     number_reviews_winery = Field(List(ReviewByWineryType), resolver=resolve_number_reviews_winery, limit=Int(), order=String())

@@ -37,15 +37,15 @@ class ProcRepository(BaseRepository):
 
         return self._map_to_entity_collection(cursor.fetchall(), "countries")
     
-    def fetch_country_regions(self):
+    def fetch_country_regions(self, country: str):
         cursor = self._db_context.get_cursor()
 
         cursor.execute("""
             SELECT
                 region.name AS region
             FROM country
-            INNER JOIN region ON country.id = region.country_id
-            """
+            INNER JOIN region ON country.id = region.country_id and country.name = %s
+            """, (country,)
         )
 
         return self._map_to_entity_collection(cursor.fetchall(), "regions")

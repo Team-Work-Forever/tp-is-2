@@ -28,8 +28,8 @@ def resolve_average_points(root, info, limit, order):
 
     return proc_repo.fetch_average_points_per_wine(limit=limit, order=order)
 
-def resolve_country_regions(root, info):
-    return proc_repo.fetch_country_regions()
+def resolve_country_regions(root, info, country: str):
+    return proc_repo.fetch_country_regions(country)
 
 def resolve_country_wines(root, info):
     return proc_repo.fetch_country_wines()
