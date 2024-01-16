@@ -10,7 +10,7 @@ class GetNumberReviewsToVinery(Handler):
     def get_name(self):
         return "get_number_reviews_winery"
 
-    def handle(self, file_name: str = '', limit = 10):
+    def handle(self, file_name: str = '', limit = 10, order = 'desc'):
         result = ''
         cursor = self.dbAccess.get_cursor()
 
@@ -20,13 +20,11 @@ class GetNumberReviewsToVinery(Handler):
                     unnest(xpath('/WineReviews/Reviews/Review/@id', xml))::text as review_id,
 	                unnest(xpath('/WineReviews/Reviews/Review/@wine_id', xml))::text as review_wine_id
                 from active_imported_documents
-                where file_name = %s
             ), wines as (
  	            select
                     unnest(xpath('/WineReviews/Wines/Wine/@id', xml))::text as wine_id,
                     unnest(xpath('/WineReviews/Wines/Wine/@winery', xml))::text as winery
                 from active_imported_documents
-                where file_name = %s
             )
             select
             w.winery as wine,
@@ -34,9 +32,10 @@ class GetNumberReviewsToVinery(Handler):
             from wines w, reviews r
             where r.review_wine_id = w.wine_id
             group by wine
-            order by qty_reviews desc
+            order by qty_reviews {order}
             limit {limit};
         """
+                # where file_name = %s
 
         try:
             cursor.execute(get_reviews, (file_name, file_name))
