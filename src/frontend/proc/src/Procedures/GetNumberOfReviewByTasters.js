@@ -6,8 +6,8 @@ import UseGrapqhQl from "../Hooks/UseGraphQl";
 import DisplayTable from "../Components/DisplayTable";
 
 export default function GetNumberOfReviewBtTasters() {
-    const { data: rest, isLoading: isLoadingRest, refetch: refetchRest } = UseRest("review.taster.rest", `/reviews/by_tasters`);
-    const { data: graphQl, isLoading: isLoadingGraph, refetch: refetchGraph } = UseGrapqhQl("review.taster.graph", `
+    const { data: rest, isLoading: isLoadingRest } = UseRest("review.taster.rest", `/reviews/by_tasters`);
+    const { data: graphQl, isLoading: isLoadingGraph } = UseGrapqhQl("review.taster.graph", `
         {
             numberReviewByTaster {
                 taster,
