@@ -71,10 +71,9 @@ def get_avarage_points_per_wine():
 # Get Number Of Reviews By Winery
 @query.route('/reviews/by_wineries', methods=['GET'])
 def get_number_of_reviews_from_winery():
-    file_name, limit, _ = _validate_query_params()
+    file_name, limit, order = _validate_query_params()
 
-
-    response = RPConnection().get_number_reviews_winery(file_name, limit)
+    response = RPConnection().get_number_reviews_winery(file_name, limit, order)
     return jsonify(toReviewFromWineryDto(response))
 
 # Get Number Of Review Made By an Taster
