@@ -73,6 +73,7 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 							<-workerPool
 						}()
 
+						deliveryTag := message.DeliveryTag
 						xmlValue := string(message.Body)
 
 						xmlReader := xml_reader.NewXmlReader()
@@ -84,6 +85,12 @@ func worker(redis *data.RedisConnection, rabbitqm *data.RabbitMQConnection) {
 
 						// Execute command
 						executer.Handle(wineReviews)
+
+						err = channel.Ack(deliveryTag, false)
+						if err != nil {
+							log.Printf("Error acknowledging message: %s", err.Error())
+						}
+
 						log.Printf("Worker %d: Migration successfully executed!", workerID)
 					}()
 				case <-signalCh:

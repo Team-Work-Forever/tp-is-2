@@ -48,16 +48,21 @@ func (rc *RabbitMQConnection) ConsumeMessages(consumer string) (<-chan amqp.Deli
 		return nil, channel, err
 	}
 
-	channel.Qos(
-		1,
+	// Get 5 each time
+	err = channel.Qos(
+		5,
 		0,
 		false,
 	)
 
+	if err != nil {
+		return nil, channel, err
+	}
+
 	messages, err := channel.Consume(
 		rc.config.RABBIT_MQ_QUEUE_ENTITIES,
 		fmt.Sprintf("consumer-%s", consumer),
-		true,
+		false,
 		false,
 		false,
 		false,
