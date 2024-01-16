@@ -45,6 +45,7 @@ COPY --from=builder /usr/src/app/src/config/prisma/schema.prisma .
 COPY ./src/api/entities/package*.json ./
 COPY ./src/api/entities/run.sh ./
 
+RUN apk add curl
 RUN npm install --omit=dev
 
 RUN npx prisma generate

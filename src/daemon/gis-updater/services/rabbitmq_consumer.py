@@ -18,6 +18,7 @@ class MessageQueue(metaclass=SingletonMeta):
         self.channel.queue_declare(queue=self.queue)
 
     def start_consuming(self, callback):
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(queue=self.queue, on_message_callback=callback, auto_ack=True)
         self.channel.start_consuming()
 

@@ -160,8 +160,6 @@ services:
     build: 
       context: .
       dockerfile: docker/images/javascript/Dockerfile
-    # volumes:
-    #   - ./src/api/entities:/usr/src/app
     ports:
       - "${EXT_API_ENTITIES_PORT}:${API_PORT}"
     env_file:
@@ -170,10 +168,10 @@ services:
       db-rel:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 5s
+      test: ["CMD", "curl", "-f", "http://api-entities:3000/health"]
+      interval: 2s
       timeout: 10s
-      retries: 5
+      retries: 10
 
   # # # Container that runs the API for gis
   api-gis:
@@ -181,7 +179,6 @@ services:
     build: docker/images/python
     volumes:
       - ./src/api/gis:/usr/src/app
-      - ./docker/volumes/xml:/xml
     ports:
       - "${EXT_API_GIS_PORT}:${API_PORT}"
     env_file:
@@ -222,15 +219,47 @@ services:
 
   frontend-gis:
     container_name: frontend-gis
-    build: docker/images/web
-    volumes:
-      - ./src/frontend/gis:/usr/src/app
+    build: 
+      context: .
+      dockerfile: docker/images/web/gis.Dockerfile
+    # volumes:
+    #   - ./src/frontend/gis:/usr/src/app
+    ports:
+      - "${EXT_PORT_FRONTEND_GIS}:3000"
+    env_file:
+      - .env
+    depends_on:
+      - api-gis
+
+  frontend-proc:
+    container_name: frontend-proc
+    build: 
+      context: .
+      dockerfile: docker/images/web/proc.Dockerfile
+    # volumes:
+    #   - ./src/frontend/gis:/usr/src/app
+    ports:
+      - "${EXT_PORT_FRONTEND_PROC}:3000"
+    env_file:
+      - .env
+    depends_on:
+      - api-proc
+      - rpc-server
+
+  frontend-ent:
+    container_name: frontend-ent
+    build: 
+      context: .
+      dockerfile: docker/images/web/ent.Dockerfile
+    # volumes:
+    #   - ./src/frontend/gis:/usr/src/app
     ports:
       - "${EXT_PORT_FRONTEND_ENT}:3000"
     env_file:
       - .env
     depends_on:
-      - api-gis
+      - api-proc
+      - rpc-server
 
   redis-broker:
     container_name: redis
