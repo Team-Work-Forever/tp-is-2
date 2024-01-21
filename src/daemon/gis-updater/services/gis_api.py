@@ -6,7 +6,7 @@ from services.api import Api
 
 class GisApi(Api):
     def __init__(self) -> None:
-        self.waiting_time = int(Env.get_var("UPDATER_GIS_GIS_WAIT_FOR_API"))
+        self.waiting_time = float(Env.get_var("UPDATER_GIS_GIS_WAIT_FOR_API"))
         super().__init__(Env.get_var("UPDATER_GIS_API_GIS_URL"))
 
     async def publish_coordinates(self, region: str, lat: float, lon: float):

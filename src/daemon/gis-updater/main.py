@@ -22,16 +22,15 @@ def recive_message(ch, method, properties, body):
         lat, lon = asyncio.run(nomatium_api.get_value(data['country'], data['region']))
 
         if lat == 0 or lon == 0:
-            print(f"Error getting coordinates... {lat}, {lon}")
-            return
+            raise Exception(f"Error getting coordinates... {lat}, {lon}")
 
         # Publish it on API-GIS
         asyncio.run(gis_api.publish_coordinates(data['region'], lat, lon))
         print(f"Publishing new coordinates... {lat}, {lon}")
-
-        # ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as e:
         print(f"Error: {e}")
+
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 # Start RabbitMq Connection
 def consume_messages():
@@ -47,8 +46,9 @@ def consume_messages():
             print(f"Error consuming messages: {e}")
             print("Reconnecting in 1 seconds...")
             time.sleep(1)
-        finally:
             message_queue.close()
+
+    message_queue.close()
 
 if __name__ == "__main__":
     consume_messages()
