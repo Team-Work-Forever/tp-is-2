@@ -77,7 +77,7 @@ services:
 
   # # # Container that automatically migrates data from db-xml to db-rel
   migrator:
-    container_name: migrator
+    # container_name: migrator
     build: 
       context: .
       dockerfile: docker/images/golang/Dockerfile
@@ -86,38 +86,9 @@ services:
       - ./docker/volumes/xml:/xml
     env_file:
       - .env
-    depends_on:
-      watcher:
-        condition: service_started
-      api-entities:
-        condition: service_healthy
-
-  migrator1:
-    container_name: migrator1
-    build: 
-      context: .
-      dockerfile: docker/images/golang/Dockerfile
-    volumes:
-      - ./src/daemon/migrator:/usr/src/app
-      - ./docker/volumes/xml:/xml
-    env_file:
-      - .env
-    depends_on:
-      watcher:
-        condition: service_started
-      api-entities:
-        condition: service_healthy
-
-  migrator2:
-    container_name: migrator2
-    build: 
-      context: .
-      dockerfile: docker/images/golang/Dockerfile
-    volumes:
-      - ./src/daemon/migrator:/usr/src/app
-      - ./docker/volumes/xml:/xml
-    env_file:
-      - .env
+    deploy:
+      mode: replicated
+      replicas: 4
     depends_on:
       watcher:
         condition: service_started
@@ -222,8 +193,6 @@ services:
     build: 
       context: .
       dockerfile: docker/images/web/gis.Dockerfile
-    # volumes:
-    #   - ./src/frontend/gis:/usr/src/app
     ports:
       - "${EXT_PORT_FRONTEND_GIS}:3000"
     env_file:
@@ -236,8 +205,6 @@ services:
     build: 
       context: .
       dockerfile: docker/images/web/proc.Dockerfile
-    # volumes:
-    #   - ./src/frontend/gis:/usr/src/app
     ports:
       - "${EXT_PORT_FRONTEND_PROC}:3000"
     env_file:
@@ -251,8 +218,6 @@ services:
     build: 
       context: .
       dockerfile: docker/images/web/ent.Dockerfile
-    # volumes:
-    #   - ./src/frontend/gis:/usr/src/app
     ports:
       - "${EXT_PORT_FRONTEND_ENT}:3000"
     env_file:
