@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- Regions -->
+    <xs:complexType name="RegionType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="id" use="required"/>
+                <xs:attribute type="xs:string" name="region" use="required"/>
+                <xs:attribute type="xs:string" name="province" use="required"/>
+                <xs:attribute type="xs:decimal" name="lat" use="required"/>
+                <xs:attribute type="xs:decimal" name="lon" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Countries -->
+    <xs:complexType name="CountryType" mixed="true">
+        <xs:sequence>
+            <xs:element type="RegionType" name="Region" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="CountriesType">
+        <xs:sequence>
+            <xs:element name="Country" type="CountryType" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Wines -->
+    <xs:complexType name="WineType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="id" use="required"/>
+                <xs:attribute type="xs:decimal" name="price" use="required"/>
+                <xs:attribute type="xs:string" name="designation" use="required"/>
+                <xs:attribute type="xs:string" name="country_id" use="required"/>
+                <xs:attribute type="xs:string" name="region_id" use="required"/>
+                <xs:attribute type="xs:string" name="variaty" use="required"/>
+                <xs:attribute type="xs:string" name="winery" use="required"/>
+                <xs:attribute type="xs:string" name="title" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="WinesType">
+        <xs:sequence>
+            <xs:element type="WineType" name="Wine" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Taster -->
+    <xs:complexType name="TasterType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="id" use="required"/>
+                <xs:attribute type="xs:string" name="name" use="required"/>
+              	<xs:attribute type="xs:string" name="twitter_handle" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="TastersType">
+        <xs:sequence>
+            <xs:element type="TasterType" name="Taster" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Reviews -->
+
+    <xs:complexType name="ReviewType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="ReviewDescription"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+        <xs:attribute type="xs:string" name="taster_id" use="required"/>
+        <xs:attribute type="xs:string" name="wine_id" use="required"/>
+        <xs:attribute type="xs:positiveInteger" name="points" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ReviewsType">
+        <xs:sequence>
+            <xs:element type="ReviewType" name="Review" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- WineReviews -->
+    <xs:complexType name="WineReviewsType">
+        <xs:sequence>
+            <xs:element type="CountriesType" name="Countries"/>
+            <xs:element type="WinesType" name="Wines"/>
+            <xs:element type="TastersType" name="Tasters"/>
+            <xs:element type="ReviewsType" name="Reviews"/>
+        </xs:sequence>
+    </xs:complexType>
+  
+  	<!-- Contrains -->
+  	<xs:element name="WineReviews" type="WineReviewsType">
+      	<!-- Define Keys -->
+  		<xs:key name="countryKey">
+          <xs:selector xpath="Countries/Country"/>
+          <xs:field xpath="@id"/>
+        </xs:key>
+
+      	<xs:key name="regionKey">
+          <xs:selector xpath="Countries/Country/Region"/>
+          <xs:field xpath="@id"/>
+        </xs:key>
+
+      	<xs:key name="wineKey">
+          <xs:selector xpath="Wines/Wine"/>
+          <xs:field xpath="@id"/>
+        </xs:key>
+        
+      	<xs:key name="tasterKey">
+          <xs:selector xpath="Tasters/Taster"/>
+          <xs:field xpath="@id"/>
+        </xs:key>
+		
+      	<!-- Define Keys Refs -->
+      	<!-- Check if Wine has region_id valid -->
+      	  <xs:keyref name="regionCountryRef" refer="countryKey">
+          	<xs:selector xpath="Countries/Country/Region"/>
+          <xs:field xpath="@country_id"/>
+    	</xs:keyref>
+      
+      	<!-- Check if Wine has country_id valid -->
+      	  <xs:keyref name="wineCountryRef" refer="countryKey">
+          	<xs:selector xpath="Wines/Wine"/>
+          <xs:field xpath="@country_id"/>
+    	</xs:keyref>
+      	
+      	<!-- Check if Wine has region_id valid -->
+      	  <xs:keyref name="wineRegionRef" refer="regionKey">
+          	<xs:selector xpath="Wines/Wine"/>
+          <xs:field xpath="@region_id"/>
+    	</xs:keyref>
+      
+     	<!-- Check if Review has taster_id valid -->
+      	  <xs:keyref name="reviewTasterRef" refer="tasterKey">
+          	<xs:selector xpath="Reviews/Review"/>
+          <xs:field xpath="@taster_id"/>
+    	</xs:keyref>
+      
+      	<!-- Check if Review has wine_id valid -->
+      	  <xs:keyref name="reviewWineRef" refer="wineKey">
+          	<xs:selector xpath="Reviews/Review"/>
+          <xs:field xpath="@wine_id"/>
+    	</xs:keyref>
+  	</xs:element>
+  	
+</xs:schema> 
