@@ -15,7 +15,7 @@ class ValidateXMLFileHandler(Handler):
         try:
             validator = XMLValidator()
             
-            if not validator.is_valid_from_string(xml_file):
+            if not validator.is_valid_from_string(str(xml_file)):
                 raise Exception("Document is not valid!")
             
         except Exception as e:

@@ -11,7 +11,7 @@ class XMLValidator():
     
     def is_valid_from_string(self, root_string):
         element = etree.fromstring(root_string)
-        
+
         return self._schema.validate(element)
 
     def is_valid(self, root_el: ET) -> bool:
