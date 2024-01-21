@@ -2,7 +2,6 @@ version: '3.7'
 
 services:
 
-  # Database to store XML data
   db-xml:
     container_name: db-xml
     build: docker/images/db/xml
@@ -20,7 +19,6 @@ services:
       timeout: 5s
       retries: 15
 
-  # Database to store Relational data
   db-rel:
     container_name: db-rel
     build: docker/images/db/rel
@@ -38,7 +36,6 @@ services:
       timeout: 5s
       retries: 15
 
-  # # # Container that automatically converts CSV to XML and then imports the XML to db-xml
   importer:
     container_name: importer
     build: docker/images/python
@@ -56,15 +53,11 @@ services:
       redis-broker:
         condition: service_started
   
-  # # # Container that runs a elixir exmaple
   watcher:
     container_name: watcher
     build: 
       context: .
       dockerfile: docker/images/elixir/Dockerfile
-    volumes:
-      - ./src/daemon/watcher:/usr/src/app
-      # - ./docker/volumes/xml:/xml
     env_file:
       - .env
     depends_on:
@@ -75,9 +68,7 @@ services:
       redis-broker:
         condition: service_started
 
-  # # # Container that automatically migrates data from db-xml to db-rel
   migrator:
-    # container_name: migrator
     build: 
       context: .
       dockerfile: docker/images/golang/Dockerfile
@@ -95,7 +86,6 @@ services:
       api-entities:
         condition: service_healthy
 
-  # # # Container that automatically migrates data from db-xml to db-rel
   gis-updater:
     container_name: gis-updater
     build: docker/images/python
@@ -110,7 +100,6 @@ services:
       api-gis:
         condition: service_started
 
-  # # # Container that runs the RPC server
   rpc-server:
     container_name: rpc-server
     build: docker/images/python
@@ -125,7 +114,6 @@ services:
       db-xml:
         condition: service_healthy
 
-  # # # Container that runs the API for entities
   api-entities:
     container_name: api-entities
     build: 
@@ -144,7 +132,6 @@ services:
       timeout: 10s
       retries: 10
 
-  # # # Container that runs the API for gis
   api-gis:
     container_name: api-gis
     build: docker/images/python
@@ -158,7 +145,6 @@ services:
       db-rel:
         condition: service_healthy
     
-  #   # # Container that runs the API for procedures
   api-proc:
     container_name: api-proc
     build: docker/images/python
@@ -173,7 +159,6 @@ services:
       rpc-server:
         condition: service_started
 
-  # # Container that runs the API for graphql
   api-graphql:
     container_name: api-graphql
     build: docker/images/python
@@ -241,8 +226,8 @@ services:
       RABBITMQ_DEFAULT_PASS: "$RABBIT_MQ_PASSWORD"
       RABBITMQ_DEFAULT_VHOST: "$RABBIT_MQ_VIRTUAL_HOST"
     ports:
-      - "${RABBIT_MQ_PORT}:5672" # AMQP protocol port
-      - "${RABBIT_MQ_UI_PORT}:15672" # management interface port
+      - "${RABBIT_MQ_PORT}:5672"
+      - "${RABBIT_MQ_UI_PORT}:15672"
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "ping", "-q" ]
       interval: 10s
